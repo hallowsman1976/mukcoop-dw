@@ -21,7 +21,8 @@
     <div id="root">
       <!-- Shown until React mounts; replaced automatically by the app. -->
       <div style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#ecfdf5,#fff,#f0fdfa);font-family:Prompt,sans-serif">
-        <img src="/logo.svg" alt="" width="96" height="96" style="border-radius:50%;box-shadow:0 10px 30px rgba(6,95,70,.15)" />
+        <img id="boot-logo" alt="" width="96" height="96" style="border-radius:50%;object-fit:contain;background:#fff;box-shadow:0 10px 30px rgba(6,95,70,.15)" onerror="this.onerror=null;this.src='/logo.svg'" />
+        <script>try{var b=JSON.parse(localStorage.getItem("coop_brand_v1")||"{}");document.getElementById("boot-logo").src=b.logoUrl||"/logo.svg"}catch(e){document.getElementById("boot-logo").src="/logo.svg"}</script>
         <div style="margin-top:20px;font-size:18px;font-weight:700;color:#1e293b">ระบบฝาก-ถอนเงินออนไลน์</div>
         <div style="margin-top:14px;width:160px;height:6px;border-radius:999px;background:#d1fae5;overflow:hidden">
           <div style="width:50%;height:100%;border-radius:999px;background:linear-gradient(90deg,#34d399,#14b8a6);animation:boot-slide 1.1s ease-in-out infinite"></div>

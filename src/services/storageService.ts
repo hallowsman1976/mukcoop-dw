@@ -1,3 +1,4 @@
+import { cacheBrand } from '../constants/brand';
 import {
   BankAccount,
   Member,
@@ -147,14 +148,19 @@ export const StorageService = {
   },
 
   // ---------------------------------------------------------------- settings (public part)
-  async loadPublicSettings(): Promise<void> {
-    if (!ApiService.isConfigured()) return;
+  /** Returns true when the settings were actually loaded from the server. */
+  async loadPublicSettings(): Promise<boolean> {
+    if (!ApiService.isConfigured()) return false;
     try {
       cache.settings = { ...DEFAULT_SYSTEM_SETTINGS, ...(await ApiService.call<SystemSettings>('getPublicSettings')) };
+      cacheBrand(cache.settings.logoUrl, cache.settings.cooperativeName);
+      return true;
     } catch {
       // keep defaults; login screen still works and shows real errors on action
+      return false;
     }
   },
+
 
   // ---------------------------------------------------------------- member session
   async loginMember(
@@ -355,6 +361,7 @@ export const StorageService = {
   async saveSystemSettings(settings: SystemSettings): Promise<SystemSettings> {
     const saved = await ApiService.call<SystemSettings>('saveSettings', { settings }, 'admin');
     cache.settings = { ...DEFAULT_SYSTEM_SETTINGS, ...saved };
+    cacheBrand(cache.settings.logoUrl, cache.settings.cooperativeName);
     if (cache.settings.liffId) localStorage.setItem('line_liff_id_v1', cache.settings.liffId);
     return cache.settings;
   },

@@ -1,12 +1,14 @@
 import React from 'react';
-import { COOP_LOGO_SRC, SYSTEM_NAME } from '../constants/brand';
+import { SYSTEM_NAME } from '../constants/brand';
+import { BrandLogo } from './BrandLogo';
 
 interface SplashScreenProps {
   message?: string;
+  logoUrl?: string;
 }
 
 /** Full-screen loading view shown while the app restores a session / signs in with LINE. */
-export const SplashScreen: React.FC<SplashScreenProps> = ({ message = 'กำลังเตรียมระบบ...' }) => (
+export const SplashScreen: React.FC<SplashScreenProps> = ({ message = 'กำลังเตรียมระบบ...', logoUrl }) => (
   <div
     role="status"
     aria-live="polite"
@@ -17,11 +19,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ message = 'กำล
 
     <div className="relative">
       <span className="absolute inset-0 rounded-full bg-emerald-400/30 animate-ping"></span>
-      <img
-        src={COOP_LOGO_SRC}
-        alt=""
-        className="relative w-24 h-24 rounded-full shadow-xl shadow-emerald-900/15 ring-4 ring-white"
-      />
+      <BrandLogo logoUrl={logoUrl} className="relative w-24 h-24 shadow-xl shadow-emerald-900/15 ring-4 ring-white" />
     </div>
 
     <h1 className="relative mt-6 text-lg font-bold text-slate-800 tracking-tight">{SYSTEM_NAME}</h1>

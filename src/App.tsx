@@ -9,6 +9,7 @@ import { StorageService } from './services/storageService';
 import { ApiService } from './services/api';
 import { ChangePasswordModal } from './components/ChangePasswordModal';
 import { SplashScreen } from './components/SplashScreen';
+import { readCachedBrand } from './constants/brand';
 import { LiffService, LiffStatus } from './services/liffService';
 import { Header } from './components/Header';
 import { LoginForm } from './components/LoginForm';
@@ -80,14 +81,16 @@ export default function App() {
   // True until the first session restore / LINE auto sign-in attempt finishes (avoids flashing the login form).
   const [booting, setBooting] = useState(true);
 
-  const [brand, setBrand] = useState({ logoUrl: '', coopName: '', lineOfficialId: '' });
+  const [brand, setBrand] = useState(() => ({ ...readCachedBrand(), lineOfficialId: '' }));
 
   const syncFromCache = () => {
-    setBrand({
-      logoUrl: StorageService.getSystemSettings().logoUrl,
-      coopName: StorageService.getSystemSettings().cooperativeName,
-      lineOfficialId: StorageService.getSystemSettings().lineOfficialId,
-    });
+    const st = StorageService.getSystemSettings();
+    // Keep the cached logo/name when the settings could not be loaded (they are still the defaults).
+    setBrand((b) => ({
+      logoUrl: st.logoUrl || b.logoUrl,
+      coopName: st.cooperativeName || b.coopName,
+      lineOfficialId: st.lineOfficialId,
+    }));
     setAccounts(StorageService.getAccounts());
     setTransactions(StorageService.getTransactions());
     setCurrentMember(StorageService.getCurrentUser());
@@ -119,7 +122,10 @@ export default function App() {
   useEffect(() => {
     (async () => {
       const bootStart = Date.now();
-      await StorageService.loadPublicSettings();
+      if (await StorageService.loadPublicSettings()) {
+        const st = StorageService.getSystemSettings();
+        setBrand((b) => ({ ...b, logoUrl: st.logoUrl, coopName: st.cooperativeName, lineOfficialId: st.lineOfficialId }));
+      }
       const status = await LiffService.init(StorageService.getLiffId());
       setLiffStatus(status);
       if (await StorageService.restoreMemberSession()) {
@@ -236,7 +242,7 @@ export default function App() {
 
   const apiConnected = ApiService.isConfigured();
 
-  if (booting) return <SplashScreen />;
+  if (booting) return <SplashScreen logoUrl={brand.logoUrl} />;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-['Prompt',sans-serif] text-slate-800">
