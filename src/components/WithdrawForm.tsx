@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
 import { Member, BankAccount, DigitalSignature, AttachedFile, TransactionRecord } from '../types';
-import { THAI_BANKS } from '../data/mockData';
+import { THAI_BANKS } from '../data/banks';
 import { formatCurrency, thaiBahtText } from '../utils/thaiBahtText';
 import { formatAccountNo } from '../utils/validators';
 import { StorageService } from '../services/storageService';

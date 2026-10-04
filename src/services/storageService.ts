@@ -10,7 +10,6 @@ import {
   AttachedFile,
   DigitalSignature,
 } from '../types';
-import { INITIAL_LOANS } from '../data/mockLoans';
 import { ApiService } from './api';
 
 /**
@@ -364,7 +363,7 @@ export const StorageService = {
     localStorage.setItem('line_liff_id_v1', id);
   },
 
-  // ---------------------------------------------------------------- loans (LOCAL DEMO – not connected to real accounts)
+  // ---------------------------------------------------------------- loans (LOCAL ONLY – no backend yet, starts empty)
   getLoans(): LoanContract[] {
     try {
       const raw = localStorage.getItem(LOANS_KEY);
@@ -372,7 +371,7 @@ export const StorageService = {
     } catch {
       // fall through to demo data
     }
-    return INITIAL_LOANS;
+    return [];
   },
 
   getLoansByMember(memberId: string): LoanContract[] {

@@ -1,4 +1,3 @@
-// Only the bank list is still static; all member/account/transaction data comes from the backend.
 export const THAI_BANKS = [
   { id: 'kbank', name: 'ธนาคารกสิกรไทย (Kasikornbank)', color: '#137f44', short: 'KBANK' },
   { id: 'scb', name: 'ธนาคารไทยพาณิชย์ (SCB)', color: '#4e2a84', short: 'SCB' },
