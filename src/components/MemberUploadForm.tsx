@@ -238,23 +238,24 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
         formattedAccNo = fallbackAccNo;
       }
 
-      // 4. Duplicate Checks (Both Member ID and Account ID)
-      const isMemberDupInDb = existingMembers.some((m) => m.memberId === paddedMId);
-      const isCitizenDupInDb = existingMembers.some((m) => m.citizenId === rawCId);
+      // 4. Duplicate checks. A member may hold several accounts, so a repeated member ID is fine
+      // as long as it carries the same citizen ID; only repeated account numbers are duplicates.
+      const knownCitizen =
+        existingMembers.find((m) => m.memberId === paddedMId)?.citizenId ||
+        rows.find((r) => r.memberId === paddedMId)?.citizenId;
+      const citizenOwner =
+        existingMembers.find((m) => m.citizenId === rawCId)?.memberId ||
+        rows.find((r) => r.citizenId === rawCId)?.memberId;
+
       const isAccountDupInDb = existingAccounts.some((a) => a.accountNo === formattedAccNo);
-
-      const isMemberDupInBatch = rows.some((r) => r.memberId === paddedMId);
       const isAccountDupInBatch = rows.some((r) => r.accountNo === formattedAccNo);
+      const isDuplicate = isAccountDupInDb || isAccountDupInBatch;
 
-      const isDuplicate =
-        isMemberDupInDb ||
-        isCitizenDupInDb ||
-        isMemberDupInBatch ||
-        isAccountDupInDb ||
-        isAccountDupInBatch;
-
-      if (isMemberDupInBatch) {
-        errors.push(`รหัสสมาชิก ${paddedMId} ซ้ำกับรายการอื่นในไฟล์เดียวกัน`);
+      if (rawCId && knownCitizen && knownCitizen !== rawCId) {
+        errors.push(`รหัสสมาชิก ${paddedMId} มีอยู่แล้วด้วยเลขบัตรประชาชนอื่น`);
+      }
+      if (rawCId && citizenOwner && citizenOwner !== paddedMId) {
+        errors.push(`เลขบัตรประชาชนนี้เป็นของรหัสสมาชิก ${citizenOwner} อยู่แล้ว`);
       }
       if (isAccountDupInBatch) {
         errors.push(`หมายเลขบัญชี ${formattedAccNo} ซ้ำกับรายการอื่นในไฟล์เดียวกัน`);
@@ -402,7 +403,7 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
                 </span>
               </div>
               <p className="text-xs text-indigo-200 mt-0.5">
-                นำเข้าสมาชิกหลายคนพร้อมกัน เติมเลขศูนย์ 5 หลักให้อัตโนมัติ และสร้างบัญชีเงินฝากเล่มแรกทันที
+                นำเข้าสมาชิกหลายคนพร้อมกัน เติมเลขศูนย์ 5 หลักให้อัตโนมัติ และสร้างบัญชีเงินฝากได้หลายบัญชีต่อสมาชิกหนึ่งคน
               </p>
             </div>
           </div>
@@ -663,7 +664,7 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
               />
               <div>
                 <span className="font-semibold text-slate-800 block">
-                  เปิดบัญชีเงินฝากเล่มแรกให้สมาชิกทันที
+                  เปิดบัญชีเงินฝากให้สมาชิกทันที
                 </span>
                 <span className="text-[11px] text-slate-400">
                   ระบบจะสร้างเลขบัญชีตามประเภทที่ระบุในไฟล์ หรือค่าเริ่มต้น
@@ -680,10 +681,10 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
               />
               <div>
                 <span className="font-semibold text-slate-800 block">
-                  อัปเดตข้อมูลสมาชิกเดิมหากรหัสสมาชิกซ้ำกัน
+                  อัปเดตบัญชีเดิมหากหมายเลขบัญชีซ้ำกัน
                 </span>
                 <span className="text-[11px] text-slate-400">
-                  เขียนทับข้อมูลติดต่อและบัญชีเดิมโดยไม่สร้างรหัสซ้ำ
+                  เขียนทับยอดและข้อมูลติดต่อของบัญชีเดิม โดยไม่สร้างบัญชีซ้ำ
                 </span>
               </div>
             </label>
@@ -708,7 +709,7 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
                 )}
                 {duplicateCount > 0 && (
                   <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full font-medium text-[11px] border border-amber-200">
-                    <AlertTriangle className="w-3.5 h-3.5" /> รหัสซ้ำ {duplicateCount}
+                    <AlertTriangle className="w-3.5 h-3.5" /> เลขบัญชีซ้ำ {duplicateCount}
                   </span>
                 )}
               </div>
