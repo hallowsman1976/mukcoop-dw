@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { RemoteImg } from './RemoteImg';
 import { TransactionRecord } from '../types';
 import { formatCurrency, thaiBahtText } from '../utils/thaiBahtText';
-import { formatAccountNo, formatThaiDateTime, formatCitizenId } from '../utils/validators';
+import { formatAccountNo, formatThaiDateTime, formatThaiDate, formatCitizenId } from '../utils/validators';
 import { OfficialWithdrawalSlipModal } from './OfficialWithdrawalSlipModal';
 import {
   ArrowDownLeft,
@@ -15,6 +15,10 @@ import {
   ExternalLink,
   ShieldCheck,
   CheckCircle2,
+  Clock,
+  XCircle,
+  History,
+  ChevronRight,
 } from 'lucide-react';
 
 interface TransactionHistoryProps {
@@ -41,187 +45,216 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
     return matchesType && matchesSearch;
   });
 
+  const totalIn = transactions
+    .filter((t) => t.type === 'deposit' && t.status !== 'rejected')
+    .reduce((s, t) => s + t.amount, 0);
+  const totalOut = transactions
+    .filter((t) => t.type === 'withdraw' && t.status !== 'rejected')
+    .reduce((s, t) => s + t.amount, 0);
+
+  // Group the (already filtered) list by calendar day, newest first.
+  const groups = React.useMemo(() => {
+    const sorted = [...filtered].sort(
+      (a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime()
+    );
+    const map = new Map<string, TransactionRecord[]>();
+    sorted.forEach((t) => {
+      const d = new Date(t.dateTime);
+      const key = isNaN(d.getTime()) ? 'ไม่ระบุวันที่' : d.toDateString();
+      map.set(key, [...(map.get(key) || []), t]);
+    });
+    return [...map.entries()];
+  }, [filtered]);
+
+  const dayLabel = (key: string) => {
+    if (key === 'ไม่ระบุวันที่') return key;
+    const d = new Date(key);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    if (d.toDateString() === today.toDateString()) return 'วันนี้';
+    if (d.toDateString() === yesterday.toDateString()) return 'เมื่อวาน';
+    return formatThaiDate(d);
+  };
+
+  const statusBadge = (status: TransactionRecord['status']) => {
+    if (status === 'pending') {
+      return (
+        <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full">
+          <Clock className="w-2.5 h-2.5" /> รอตรวจสอบ
+        </span>
+      );
+    }
+    if (status === 'rejected') {
+      return (
+        <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded-full">
+          <XCircle className="w-2.5 h-2.5" /> ปฏิเสธ
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+        <CheckCircle2 className="w-2.5 h-2.5" /> สำเร็จ
+      </span>
+    );
+  };
+
+  const filters: { id: string; label: string; count: number; active: string }[] = [
+    { id: 'all', label: 'ทั้งหมด', count: transactions.length, active: 'bg-slate-900 text-white' },
+    {
+      id: 'deposit',
+      label: 'ฝากเงิน',
+      count: transactions.filter((t) => t.type === 'deposit').length,
+      active: 'bg-emerald-600 text-white',
+    },
+    {
+      id: 'withdraw',
+      label: 'ถอนเงิน',
+      count: transactions.filter((t) => t.type === 'withdraw').length,
+      active: 'bg-rose-600 text-white',
+    },
+  ];
+
   return (
-    <div className="space-y-4">
-      {/* Header & Filters */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-2xs space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="max-w-3xl mx-auto space-y-4">
+      {/* Header + summary */}
+      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-teal-600 via-teal-700 to-emerald-800 text-white p-5 shadow-xl shadow-teal-900/15">
+        <div className="absolute -top-14 -right-8 w-48 h-48 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+        <div className="relative flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/20 flex items-center justify-center shrink-0">
+            <History className="w-6 h-6" />
+          </div>
           <div>
-            <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-              <span className="w-2 h-5 bg-teal-600 rounded-full inline-block"></span>
-              ประวัติรายการฝาก-ถอนเงิน (Transaction Ledger)
-            </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              บันทึกการทำธุรกรรมแบบเรียลไทม์ พร้อมหลักฐานสลิปและลายมือชื่ออิเล็กทรอนิกส์
-            </p>
-          </div>
-
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-            <button
-              onClick={() => setFilterType('all')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
-                filterType === 'all'
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              ทั้งหมด ({transactions.length})
-            </button>
-            <button
-              onClick={() => setFilterType('deposit')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
-                filterType === 'deposit'
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-              }`}
-            >
-              ฝากเงิน ({transactions.filter((t) => t.type === 'deposit').length})
-            </button>
-            <button
-              onClick={() => setFilterType('withdraw')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
-                filterType === 'withdraw'
-                  ? 'bg-rose-600 text-white'
-                  : 'bg-rose-50 text-rose-700 hover:bg-rose-100'
-              }`}
-            >
-              ถอนเงิน ({transactions.filter((t) => t.type === 'withdraw').length})
-            </button>
+            <h2 className="text-lg font-bold leading-tight">ประวัติธุรกรรม</h2>
+            <p className="text-xs text-teal-100/90">{transactions.length} รายการ พร้อมใบเสร็จอิเล็กทรอนิกส์</p>
           </div>
         </div>
-
-        {/* Search */}
-        <div className="relative">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="ค้นหาด้วยรหัสธุรกรรม, เลขบัญชี, หรือชื่อสมาชิก..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white"
-          />
-        </div>
-
-        {/* Transactions List */}
-        <div className="divide-y divide-slate-100">
-          {filtered.length > 0 ? (
-            filtered.map((t) => {
-              const isDeposit = t.type === 'deposit';
-              return (
-                <div
-                  key={t.id}
-                  className="py-3 sm:py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/60 rounded-xl px-2 transition-colors cursor-pointer group"
-                  onClick={() => setSelectedTxn(t)}
-                >
-                  <div className="flex items-start gap-3">
-                    <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                        isDeposit
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-rose-100 text-rose-700'
-                      }`}
-                    >
-                      {isDeposit ? (
-                        <ArrowDownLeft className="w-5 h-5" />
-                      ) : (
-                        <ArrowUpRight className="w-5 h-5" />
-                      )}
-                    </div>
-
-                    <div className="space-y-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-900">
-                          {isDeposit ? 'ฝากเงินเข้าบัญชี' : 'ถอนเงินโอนออก'}
-                        </span>
-                        <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
-                          {t.refCode}
-                        </span>
-                        <span className="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.2 rounded font-medium flex items-center gap-0.5">
-                          <CheckCircle2 className="w-2.5 h-2.5" /> สำเร็จ
-                        </span>
-                      </div>
-
-                      <p className="text-xs text-slate-600">
-                        {t.accountName} • บัญชี {formatAccountNo(t.accountNo)}
-                      </p>
-
-                      <p className="text-[11px] text-slate-400">
-                        {formatThaiDateTime(t.dateTime)}
-                        {t.destinationBank && ` → ${t.destinationBank}`}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between sm:justify-end gap-4 pl-13 sm:pl-0">
-                    <div className="text-right">
-                      <div
-                        className={`text-sm font-bold font-mono ${
-                          isDeposit ? 'text-emerald-600' : 'text-rose-600'
-                        }`}
-                      >
-                        {isDeposit ? '+' : '-'}฿{formatCurrency(t.amount)}
-                      </div>
-                      <div className="text-[11px] text-slate-400 font-mono">
-                        คงเหลือ: ฿{formatCurrency(t.balanceAfter)}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onOpenFlexModal(t);
-                        }}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-[#06C755] hover:bg-emerald-50 transition-colors"
-                        title="ดู LINE Flex Message"
-                      >
-                        <MessageSquare className="w-4 h-4" />
-                      </button>
-                      {t.type === 'withdraw' && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPrintingWithdrawSlipTxn(t);
-                          }}
-                          className="p-1.5 rounded-lg text-indigo-600 hover:bg-indigo-50 transition-colors cursor-pointer"
-                          title="พิมพ์ใบถอนเงินออนไลน์ตามแบบฟอร์มทางการ"
-                        >
-                          <Printer className="w-4 h-4" />
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedTxn(t);
-                        }}
-                        className="px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] font-medium text-slate-600 group-hover:border-slate-300 group-hover:bg-white cursor-pointer"
-                      >
-                        สลิปฉบับเต็ม
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className="py-10 text-center text-slate-400 text-xs">
-              ไม่พบประวัติรายการที่ค้นหา
+        <div className="relative mt-4 grid grid-cols-2 gap-2.5">
+          <div className="rounded-2xl bg-white/10 border border-white/15 px-3 py-2.5">
+            <div className="flex items-center gap-1 text-[11px] text-emerald-100">
+              <ArrowDownLeft className="w-3 h-3" /> ฝากรวม
             </div>
-          )}
+            <div className="mt-0.5 text-sm sm:text-base font-bold font-mono">฿{formatCurrency(totalIn)}</div>
+          </div>
+          <div className="rounded-2xl bg-white/10 border border-white/15 px-3 py-2.5">
+            <div className="flex items-center gap-1 text-[11px] text-rose-200">
+              <ArrowUpRight className="w-3 h-3" /> ถอนรวม
+            </div>
+            <div className="mt-0.5 text-sm sm:text-base font-bold font-mono">฿{formatCurrency(totalOut)}</div>
+          </div>
         </div>
       </div>
+
+      {/* Filters */}
+      <div className="space-y-3">
+        <div className="flex p-1 bg-slate-100 rounded-2xl gap-1">
+          {filters.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => setFilterType(f.id)}
+              className={`flex-1 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                filterType === f.id ? `${f.active} shadow-sm` : 'text-slate-600 hover:bg-white/70'
+              }`}
+            >
+              {f.label} <span className="opacity-70 font-mono">({f.count})</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="relative">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="ค้นหารหัสธุรกรรม หรือเลขบัญชี"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-3 py-3 text-sm bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+          />
+        </div>
+      </div>
+
+      {/* List grouped by day */}
+      {groups.length > 0 ? (
+        <div className="space-y-4">
+          {groups.map(([key, items]) => (
+            <section key={key} className="space-y-2">
+              <h3 className="px-1 text-xs font-bold text-slate-500">{dayLabel(key)}</h3>
+              <div className="bg-white border border-slate-200 rounded-3xl divide-y divide-slate-100 overflow-hidden shadow-2xs">
+                {items.map((t) => {
+                  const isDeposit = t.type === 'deposit';
+                  const rejected = t.status === 'rejected';
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setSelectedTxn(t)}
+                      className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-slate-50 active:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      <div
+                        className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${
+                          isDeposit ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                        }`}
+                      >
+                        {isDeposit ? <ArrowDownLeft className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
+                      </div>
+
+                      <div className="flex-1 min-w-0 space-y-0.5">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-bold text-slate-900">
+                            {isDeposit ? 'ฝากเงิน' : 'ถอนเงิน'}
+                          </span>
+                          {statusBadge(t.status)}
+                        </div>
+                        <p className="text-xs text-slate-500 truncate">
+                          บัญชี {formatAccountNo(t.accountNo)}
+                          {t.destinationBank && ` → ${t.destinationBank}`}
+                        </p>
+                        <p className="text-[11px] text-slate-400">{formatThaiDateTime(t.dateTime)}</p>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <div
+                          className={`text-sm font-bold font-mono ${
+                            rejected
+                              ? 'text-slate-400 line-through'
+                              : isDeposit
+                              ? 'text-emerald-600'
+                              : 'text-rose-600'
+                          }`}
+                        >
+                          {isDeposit ? '+' : '-'}฿{formatCurrency(t.amount)}
+                        </div>
+                        <div className="text-[11px] text-slate-400 font-mono">
+                          คงเหลือ ฿{formatCurrency(t.balanceAfter)}
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-300 shrink-0" />
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white border border-dashed border-slate-300 rounded-3xl py-12 text-center">
+          <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-2">
+            <Search className="w-5 h-5" />
+          </div>
+          <p className="text-sm font-semibold text-slate-600">ไม่พบรายการ</p>
+          <p className="text-xs text-slate-400 mt-0.5">ลองเปลี่ยนตัวกรองหรือคำค้นหา</p>
+        </div>
+      )}
 
       {/* Transaction Details & Receipt Modal */}
       {selectedTxn && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+          className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4 overflow-y-auto"
           onClick={() => setSelectedTxn(null)}
         >
           <div
-            className="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl my-6 animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white rounded-t-3xl sm:rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl sm:my-6 animate-in slide-in-from-bottom-6 sm:zoom-in-95 fade-in duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
