@@ -6,3 +6,8 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# agent skills (installed locally)
+.agents/
+.claude/skills/
+skills-lock.json
