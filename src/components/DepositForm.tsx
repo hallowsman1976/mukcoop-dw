@@ -17,9 +17,7 @@ import {
   AlertCircle,
   Calendar,
   Clock,
-  QrCode,
   ScanLine,
-  Sparkles,
   Info,
   ShieldAlert,
 } from 'lucide-react';
@@ -229,249 +227,208 @@ export const DepositForm: React.FC<DepositFormProps> = ({
     })();
   };
 
+  const stepBadge = (n: number) => (
+    <span className="w-6 h-6 rounded-full bg-emerald-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0">
+      {n}
+    </span>
+  );
+
   return (
-    <div className="max-w-2xl mx-auto my-4 bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
-      {/* Banner */}
-      <div className="bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-600 p-5 text-white">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center">
-              <ArrowDownLeft className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-base font-bold">แบบฟอร์มการฝากเงินออนไลน์</h2>
-              <p className="text-xs text-emerald-100">
-                ระบบสหกรณ์ออมทรัพย์ / กองทุนการเงิน (ยืนยันสิทธิ์สมาชิก {currentMember.memberId})
-              </p>
-            </div>
+    <div className="max-w-2xl mx-auto my-2 sm:my-4 space-y-4">
+      {/* Header */}
+      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white p-5 shadow-xl shadow-emerald-900/15">
+        <div className="absolute -top-14 -right-8 w-48 h-48 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+        <div className="relative flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/20 flex items-center justify-center shrink-0">
+            <ArrowDownLeft className="w-6 h-6" />
           </div>
-          <span className="text-xs bg-white/20 px-2.5 py-1 rounded-full font-medium">
-            ฝากเงิน (Deposit)
-          </span>
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold leading-tight">ฝากเงิน</h2>
+            <p className="text-xs text-emerald-100/90 truncate">
+              {currentMember.fullName} • รหัสสมาชิก {currentMember.memberId}
+            </p>
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-6">
-        {/* Section 1: ข้อมูลที่ถูกดึงโดยอัตโนมัติหลังจากเข้าสู่ระบบ */}
-        <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" /> ข้อมูลบัญชีที่ดึงโดยอัตโนมัติ
-            </span>
-            {memberAccounts.length > 1 && (
-              <span className="text-[11px] text-slate-500">
-                มี {memberAccounts.length} บัญชี (เลือกบัญชีที่ต้องการฝาก)
-              </span>
-            )}
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Step 1: choose account */}
+        <section className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            {stepBadge(1)} เลือกบัญชีที่ต้องการฝาก
+          </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {/* หมายเลขบัญชี */}
-            <div>
-              <label className="text-[11px] font-semibold text-slate-500 block mb-1">
-                หมายเลขบัญชี
-              </label>
-              {memberAccounts.length > 1 ? (
-                <select
-                  value={selectedAccountNo}
-                  onChange={(e) => setSelectedAccountNo(e.target.value)}
-                  className="w-full text-xs font-mono font-bold text-slate-900 bg-white border border-slate-300 rounded-xl px-2.5 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                >
-                  {memberAccounts.map((acc) => (
-                    <option key={acc.accountNo} value={acc.accountNo}>
-                      {formatAccountNo(acc.accountNo)} ({acc.accountType})
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <div className="text-xs font-mono font-bold text-slate-900 bg-white border border-slate-200 rounded-xl px-3 py-2">
-                  {currentAccount ? formatAccountNo(currentAccount.accountNo) : '-'}
-                </div>
-              )}
+          {memberAccounts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {memberAccounts.map((acc) => {
+                const active = currentAccount?.accountNo === acc.accountNo;
+                const special = acc.accountType === 'ออมทรัพย์พิเศษ';
+                return (
+                  <button
+                    key={acc.accountNo}
+                    type="button"
+                    onClick={() => setSelectedAccountNo(acc.accountNo)}
+                    className={`text-left rounded-2xl p-3.5 border-2 transition-all cursor-pointer ${
+                      active
+                        ? 'border-emerald-500 bg-emerald-50/70 shadow-sm'
+                        : 'border-slate-200 bg-white hover:border-emerald-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                          special ? 'bg-slate-800 text-white' : 'bg-emerald-100 text-emerald-800'
+                        }`}
+                      >
+                        {acc.accountType}
+                      </span>
+                      <span
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          active ? 'border-emerald-600 bg-emerald-600' : 'border-slate-300'
+                        }`}
+                      >
+                        {active && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
+                      </span>
+                    </div>
+                    <div className="mt-2 font-mono text-sm font-bold text-slate-900 tracking-wide">
+                      {formatAccountNo(acc.accountNo)}
+                    </div>
+                    <div className="text-[11px] text-slate-500 truncate">{acc.accountName}</div>
+                    <div className="mt-1.5 text-xs text-slate-500">
+                      คงเหลือ{' '}
+                      <span className="font-mono font-bold text-slate-800">฿{formatCurrency(acc.balance)}</span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
-
-            {/* ชื่อบัญชี */}
-            <div>
-              <label className="text-[11px] font-semibold text-slate-500 block mb-1">
-                ชื่อบัญชี
-              </label>
-              <div className="text-xs font-medium text-slate-900 bg-white border border-slate-200 rounded-xl px-3 py-2 truncate">
-                {currentAccount ? currentAccount.accountName : currentMember.fullName}
-              </div>
-            </div>
-
-            {/* ประเภทบัญชี */}
-            <div>
-              <label className="text-[11px] font-semibold text-slate-500 block mb-1">
-                ประเภทบัญชี
-              </label>
-              <div className="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 flex items-center justify-between">
-                <span>{currentAccount?.accountType || 'ออมทรัพย์'}</span>
-                <span className="text-[10px] bg-white px-1.5 py-0.5 rounded text-slate-600">
-                  ดอกเบี้ย {currentAccount?.interestRate || 1.75}%
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
-            <span className="text-slate-600 font-medium">ยอดเงินคงเหลือก่อนฝาก:</span>
-            <span className="text-sm font-bold text-slate-900 font-mono">
-              ฿{formatCurrency(currentBalance)}
-            </span>
-          </div>
-        </div>
-
-        {/* Section 2: วัน เวลาที่ฝาก (Date Flat pickr) */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-              <Calendar className="w-4 h-4 text-emerald-600" />
-              วันและเวลาที่โอนเงินฝาก (Date & Time Picker) <span className="text-rose-500">*</span>
-            </label>
-            <button
-              type="button"
-              onClick={setDateToNow}
-              className="text-xs text-emerald-600 hover:text-emerald-700 font-medium underline"
-            >
-              ตั้งเป็นเวลาปัจจุบัน
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Date Input */}
-            <div className="relative">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] text-slate-500 font-medium">วันที่ทำรายการ</span>
-                <span className="text-[11px] text-slate-400">พ.ศ. / ค.ศ.</span>
-              </div>
-              <div className="relative">
-                <input
-                  type="date"
-                  value={depositDate}
-                  onChange={(e) => setDepositDate(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 text-xs font-mono font-medium text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
-                  required
-                />
-                <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
-            </div>
-
-            {/* Time Input */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] text-slate-500 font-medium">เวลาที่โอน (น.)</span>
-                <span className="text-[11px] text-slate-400">ตามที่ระบุในสลิป</span>
-              </div>
-              <div className="relative">
-                <input
-                  type="time"
-                  value={depositTime}
-                  onChange={(e) => setDepositTime(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 text-xs font-mono font-medium text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
-                  required
-                />
-                <Clock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
-            </div>
-          </div>
-
-          {/* Thai date preview */}
-          {depositDate && (
-            <p className="text-[11px] text-slate-500">
-              วันเวลาที่บันทึก:{' '}
-              <span className="font-semibold text-slate-700">
-                {formatThaiDateTime(`${depositDate}T${depositTime || '00:00'}`)}
-              </span>
-            </p>
+          ) : (
+            <p className="text-xs text-slate-500">ไม่พบบัญชีเงินฝากของสมาชิก</p>
           )}
-        </div>
+        </section>
 
-        {/* Section 3: จำนวนเงินฝาก */}
-        <div className="space-y-3 pt-2 border-t border-slate-100">
-          <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-            จำนวนเงินฝาก (บาท) <span className="text-rose-500">*</span>
-          </label>
+        {/* Step 2: amount */}
+        <section className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            {stepBadge(2)} จำนวนเงินฝาก <span className="text-rose-500">*</span>
+          </h3>
 
-          <div className="relative">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg font-bold text-slate-400">
-              ฿
-            </span>
+          <div className="rounded-2xl bg-slate-50 border border-slate-200 focus-within:border-emerald-500 focus-within:ring-4 focus-within:ring-emerald-500/10 focus-within:bg-white transition-all px-4 py-3 flex items-baseline justify-center gap-2">
+            <span className="text-2xl font-bold text-slate-400">฿</span>
             <input
               type="text"
               inputMode="decimal"
               placeholder="0.00"
               value={amountInput}
               onChange={handleAmountChange}
-              className="w-full pl-9 pr-4 py-3 text-lg font-mono font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all tracking-wide"
+              className="w-full min-w-0 text-center text-4xl font-bold font-mono text-slate-900 bg-transparent focus:outline-none placeholder:text-slate-300"
               required
             />
           </div>
 
-          {/* Thai Baht text */}
-          {numericAmount > 0 && (
-            <div className="p-2.5 rounded-xl bg-slate-100/70 border border-slate-200 text-xs text-slate-700 flex items-start gap-1.5">
-              <Info className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
-              <div>
-                <span className="font-semibold text-slate-800">จำนวนเงินตัวอักษร:</span>{' '}
-                <span className="text-emerald-800 font-medium">{thaiBahtText(numericAmount)}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Quick Amount Buttons */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] text-slate-400 mr-1">จำนวนด่วน:</span>
+          <div className="flex flex-wrap items-center justify-center gap-2">
             {quickAmounts.map((amt) => (
               <button
                 key={amt}
                 type="button"
                 onClick={() => handleSelectQuickAmount(amt)}
-                className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg text-xs font-mono transition-all"
+                className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold border transition-all active:scale-95 cursor-pointer ${
+                  numericAmount === amt
+                    ? 'bg-emerald-600 border-emerald-600 text-white'
+                    : 'bg-white border-slate-200 text-slate-700 hover:border-emerald-400 hover:text-emerald-700'
+                }`}
               >
-                +{amt.toLocaleString()}
+                {amt.toLocaleString()}
               </button>
             ))}
           </div>
 
-          {/* Real-time Balance Preview */}
           {numericAmount > 0 && (
-            <div className="p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs flex items-center justify-between">
-              <span>ยอดคงเหลือหลังการฝาก:</span>
-              <span className="font-bold font-mono text-sm">฿{formatCurrency(newBalance)}</span>
+            <div className="space-y-2">
+              <div className="p-2.5 rounded-xl bg-slate-100/70 text-xs text-slate-700 flex items-start gap-1.5">
+                <Info className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+                <span className="text-emerald-800 font-medium">{thaiBahtText(numericAmount)}</span>
+              </div>
+              <div className="p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs flex items-center justify-between">
+                <span>
+                  ยอดหลังฝาก <span className="text-emerald-600/80">(เดิม ฿{formatCurrency(currentBalance)})</span>
+                </span>
+                <span className="font-bold font-mono text-base">฿{formatCurrency(newBalance)}</span>
+              </div>
             </div>
           )}
-        </div>
+        </section>
 
-        {/* Section 4: แนบสลิปเงินโอน (ไฟล์ภาพไม่เกิน 5MB) & API ตรวจสอบสลิป */}
-        <div className="space-y-3 pt-2 border-t border-slate-100">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h3 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <QrCode className="w-4 h-4 text-emerald-600" />
-                แนบสลิปเงินโอน และระบบตรวจสอบอัตโนมัติ
-              </h3>
-              <p className="text-[11px] text-slate-500">
-                รองรับไฟล์ภาพ JPEG, PNG ขนาดไม่เกิน 5MB พร้อม API ตรวจสอบสลิป
-              </p>
+        {/* Step 3: date and time */}
+        <section className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              {stepBadge(3)} วัน-เวลาที่โอน <span className="text-rose-500">*</span>
+            </h3>
+            <button
+              type="button"
+              onClick={setDateToNow}
+              className="text-xs text-emerald-700 hover:text-emerald-800 font-semibold cursor-pointer"
+            >
+              ใช้เวลาปัจจุบัน
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="relative">
+              <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="date"
+                value={depositDate}
+                onChange={(e) => setDepositDate(e.target.value)}
+                className="w-full pl-9 pr-2 py-3 text-xs font-mono font-medium text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
+                required
+              />
             </div>
+            <div className="relative">
+              <Clock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="time"
+                value={depositTime}
+                onChange={(e) => setDepositTime(e.target.value)}
+                className="w-full pl-9 pr-2 py-3 text-xs font-mono font-medium text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
+                required
+              />
+            </div>
+          </div>
 
+          {depositDate && (
+            <p className="text-[11px] text-slate-500">
+              บันทึกเป็น:{' '}
+              <span className="font-semibold text-slate-700">
+                {formatThaiDateTime(`${depositDate}T${depositTime || '00:00'}`)}
+              </span>
+            </p>
+          )}
+        </section>
+
+        {/* Step 4: slip */}
+        <section className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              {stepBadge(4)} แนบสลิปเงินโอน <span className="text-rose-500">*</span>
+            </h3>
             {slipFile && (
               <button
                 type="button"
                 onClick={handleVerifySlipWithApi}
                 disabled={isVerifyingSlip}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-medium transition-all shadow-xs disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-full text-xs font-medium transition-all disabled:opacity-50 cursor-pointer"
               >
                 {isVerifyingSlip ? (
                   <>
                     <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    <span>กำลังเชื่อมต่อ API ตรวจสอบ...</span>
+                    <span>กำลังตรวจสอบ...</span>
                   </>
                 ) : (
                   <>
                     <ScanLine className="w-3.5 h-3.5" />
-                    <span>ตรวจสอบสลิปด้วย API</span>
+                    <span>ตรวจสอบสลิป</span>
                   </>
                 )}
               </button>
@@ -483,48 +440,41 @@ export const DepositForm: React.FC<DepositFormProps> = ({
             required
             value={slipFile}
             onChange={handleSlipChange}
-            helperText="ไฟล์ภาพสลิปที่โอนจาก Mobile Banking (ไม่เกิน 5MB)"
+            helperText="ภาพสลิปจาก Mobile Banking (JPEG, PNG ไม่เกิน 5MB)"
           />
 
-          {/* API Verification Result Card */}
           {verificationResult && (
             <div className="p-3.5 rounded-2xl border border-teal-200 bg-teal-50/70 space-y-2 text-xs">
-              <div className="flex items-center justify-between text-teal-800 font-semibold">
-                <span className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-teal-600" />
-                  ผลการตรวจสอบจาก Slip Verification API
-                </span>
-                <span className="text-[10px] bg-teal-200/80 text-teal-900 px-2 py-0.5 rounded-full font-mono">
-                  ความแม่นยำ 99.8%
-                </span>
+              <div className="flex items-center gap-1.5 text-teal-800 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-teal-600" />
+                ผลการตรวจสอบสลิป
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-700 bg-white/80 p-2.5 rounded-xl border border-teal-100">
                 <div>
-                  <span className="text-slate-400 block">ธนาคารที่โอน:</span>
+                  <span className="text-slate-400 block">ธนาคารที่โอน</span>
                   <span className="font-semibold text-slate-800">
                     {verificationResult.bankName || 'ธนาคารกสิกรไทย'}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">รหัสอ้างอิง (TransRef):</span>
-                  <span className="font-mono font-semibold text-slate-800">
+                  <span className="text-slate-400 block">รหัสอ้างอิง</span>
+                  <span className="font-mono font-semibold text-slate-800 break-all">
                     {verificationResult.transRef}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">ยอดเงินบนสลิป:</span>
+                  <span className="text-slate-400 block">ยอดเงินบนสลิป</span>
                   <span className="font-mono font-bold text-teal-700">
                     ฿{formatCurrency(verificationResult.amount || numericAmount)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">วันเวลาบนสลิป:</span>
+                  <span className="text-slate-400 block">วันเวลาบนสลิป</span>
                   <span className="font-mono text-slate-700">{verificationResult.dateTime}</span>
                 </div>
               </div>
 
-              {/* Check discrepancy with amountInput */}
               {numericAmount > 0 &&
                 verificationResult.amount &&
                 Math.abs(numericAmount - verificationResult.amount) > 0.01 && (
@@ -538,48 +488,40 @@ export const DepositForm: React.FC<DepositFormProps> = ({
                 )}
             </div>
           )}
-        </div>
 
-        {/* Note / Remarks */}
-        <div className="pt-2 border-t border-slate-100">
-          <label className="text-[11px] font-semibold text-slate-600 block mb-1">
-            บันทึกช่วยจำ (ไม่บังคับ)
-          </label>
           <input
             type="text"
-            placeholder="เช่น ฝากเงินสะสมประจำงวด, โบนัส, เงินออมพิเศษ"
+            placeholder="บันทึกช่วยจำ (ไม่บังคับ) เช่น ฝากสะสมประจำงวด"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+            className="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none"
           />
-        </div>
+        </section>
 
-        {/* Error notice */}
         {error && (
-          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-start gap-2">
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 flex items-start gap-2">
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
-        {/* Actions */}
-        <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-end gap-2.5">
+        <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
           <button
             type="button"
             onClick={onCancel}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+            className="px-5 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
           >
             ยกเลิก
           </button>
           <button
             type="submit"
             disabled={isSubmitting || numericAmount <= 0}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white text-xs font-semibold shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="px-8 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white text-sm font-bold shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:shadow-none"
           >
             {isSubmitting ? (
               <>
-                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                <span>กำลังบันทึกรายการฝาก...</span>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                <span>กำลังบันทึก...</span>
               </>
             ) : (
               <>
