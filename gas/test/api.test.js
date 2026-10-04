@@ -91,7 +91,10 @@ test('LINE binding: first login binds, other LINE account is refused', () => {
   const { env } = boot();
   env.props.LINE_LOGIN_CHANNEL_ID = 'chan';
   env.lineVerify = (p) => ({ sub: p.id_token });
-  memberToken(env, '00405', '3100100456786', 'Unew');
+  const first = env.call('memberLogin', { memberId: '405', citizenId: '3100100456786', idToken: 'Unew' });
+  assert.strictEqual(first.data.newlyLinked, true);
+  const again = env.call('memberLogin', { memberId: '405', citizenId: '3100100456786', idToken: 'Unew' });
+  assert.strictEqual(again.data.newlyLinked, false);
   assert.strictEqual(env.read('Members').find((m) => m.memberId === '00405').lineUserId, 'Unew');
   const r = env.call('memberLogin', { memberId: '405', citizenId: '3100100456786', idToken: 'Uother' });
   assert.strictEqual(r.code, 'LINE_MISMATCH');

@@ -24,6 +24,8 @@ export interface Member {
   avatarUrl?: string;
   registeredDate: string;
   notificationSettings?: LineNotificationSettings;
+  /** Set on the login response only: this sign-in linked the LINE account to the member. */
+  newlyLinked?: boolean;
 }
 
 export interface BankAccount {

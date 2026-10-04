@@ -152,6 +152,7 @@ function memberLogin_(p) {
   if (!member || !safeEqual(onlyDigits(member.citizenId), citizenId)) fail();
 
   let lineUserId = '';
+  let newlyLinked = false;
   if (p.idToken) {
     lineUserId = verifyLiffIdToken_(String(p.idToken));
   } else if (prop_('ALLOW_SANDBOX_MEMBER_AUTH') !== 'true') {
@@ -175,6 +176,7 @@ function memberLogin_(p) {
         upd.lineUserId = lineUserId;
         writeRow_('Members', fresh.__row, upd);
         member.lineUserId = lineUserId;
+        newlyLinked = true;
       } finally {
         lock.releaseLock();
       }
@@ -183,7 +185,7 @@ function memberLogin_(p) {
 
   clearFails_(key);
   const token = createSession_({ role: 'member', memberId: memberId }, 6 * 3600);
-  return { token: token, member: publicMember_(member) };
+  return { token: token, member: publicMember_(member), newlyLinked: newlyLinked };
 }
 
 /**

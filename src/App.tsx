@@ -146,7 +146,11 @@ export default function App() {
     syncFromCache();
     setViewMode('member');
     setActiveTab('dashboard');
-    showNotification(`ยินดีต้อนรับคุณ ${member.fullName} (รหัสสมาชิก ${member.memberId})`);
+    showNotification(
+      member.newlyLinked
+        ? `ผูกบัญชี LINE สำเร็จ ครั้งต่อไปเข้าสู่ระบบอัตโนมัติ — ยินดีต้อนรับคุณ ${member.fullName}`
+        : `ยินดีต้อนรับคุณ ${member.fullName} (รหัสสมาชิก ${member.memberId})`
+    );
   };
 
   const handleLogout = async () => {
@@ -296,6 +300,7 @@ export default function App() {
               <LoginForm
                 onLoginSuccess={handleLoginSuccess}
                 liffProfile={liffStatus.profile}
+                liffStatus={liffStatus}
                 logoUrl={brand.logoUrl}
                 coopName={brand.coopName}
                 onOpenLiffConfig={() => setShowLiffModal(true)}

@@ -158,11 +158,11 @@ export const StorageService = {
 
   // ---------------------------------------------------------------- member session
   async loginMember(memberId: string, citizenId: string, idToken?: string): Promise<Member> {
-    const r = await ApiService.call<{ token: string; member: Member }>('memberLogin', { memberId, citizenId, idToken });
+    const r = await ApiService.call<{ token: string; member: Member; newlyLinked?: boolean }>('memberLogin', { memberId, citizenId, idToken });
     ApiService.setToken('member', r.token);
     cache.currentMember = r.member;
     await this.refreshMember();
-    return cache.currentMember || r.member;
+    return { ...(cache.currentMember || r.member), newlyLinked: !!r.newlyLinked };
   },
 
   /** Sign in with the LINE account alone; throws NOT_LINKED (ApiError) when it is not linked to a member yet. */

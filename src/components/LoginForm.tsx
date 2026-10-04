@@ -4,12 +4,13 @@ import React, { useState } from 'react';
 import { Member, LiffUserProfile } from '../types';
 import { padMemberId, formatCitizenId } from '../utils/validators';
 import { StorageService } from '../services/storageService';
-import { LiffService } from '../services/liffService';
-import { UserCheck, AlertCircle, CheckCircle2, UserPlus } from 'lucide-react';
+import { LiffService, LiffStatus } from '../services/liffService';
+import { UserCheck, AlertCircle, CheckCircle2, UserPlus, Smartphone } from 'lucide-react';
 
 interface LoginFormProps {
   onLoginSuccess: (member: Member) => void;
   liffProfile: LiffUserProfile | null;
+  liffStatus?: LiffStatus;
   onOpenLiffConfig: () => void;
   logoUrl?: string;
   coopName?: string;
@@ -19,6 +20,7 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({
   onLoginSuccess,
   liffProfile,
+  liffStatus,
   onOpenLiffConfig,
   logoUrl,
   coopName,
@@ -62,7 +64,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
     const paddedId = padMemberId(memberIdInput);
     setMemberIdInput(paddedId);
-    const cleanedCitizenId = citizenIdInput.replace(/D/g, '');
+    const cleanedCitizenId = citizenIdInput.replace(/\D/g, '');
 
     if (!paddedId || paddedId.length !== 5) {
       setError('กรุณาระบุรหัสสมาชิกให้ครบถ้วน (ระบบจะเติมเลข 0 ให้อัตโนมัติเป็น 5 หลัก)');
@@ -102,40 +104,96 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </p>
       </div>
 
-      {/* LINE Profile Badge if detected */}
-      {liffProfile && (
-        <div className="mb-4 bg-emerald-50/70 border border-emerald-200 rounded-2xl p-3 flex items-center justify-between">
+      {/* LINE account linking guide */}
+      <div className="mb-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-2xs space-y-3">
+        {liffProfile ? (
           <div className="flex items-center gap-3">
             {liffProfile.pictureUrl ? (
               <img
                 src={liffProfile.pictureUrl}
                 alt={liffProfile.displayName}
-                className="w-10 h-10 rounded-full border border-emerald-300 object-cover"
+                className="w-12 h-12 rounded-full ring-2 ring-[#06C755]/50 object-cover shrink-0"
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold">
+              <div className="w-12 h-12 rounded-full bg-[#06C755] text-white flex items-center justify-center font-bold shrink-0">
                 {liffProfile.displayName.charAt(0)}
               </div>
             )}
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-slate-800">{liffProfile.displayName}</span>
-                <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.2 rounded font-medium">
-                  LINE Verified
-                </span>
+                <span className="text-sm font-bold text-slate-900 truncate">{liffProfile.displayName}</span>
+                <CheckCircle2 className="w-4 h-4 text-[#06C755] shrink-0" />
               </div>
-              <p className="text-[11px] text-slate-500">เชื่อมต่อผ่าน LINE LIFF Gateway</p>
+              <p className="text-[11px] text-slate-500">
+                เข้าสู่ระบบ LINE แล้ว • กรอกข้อมูลสมาชิกด้านล่างเพื่อผูกบัญชีนี้
+              </p>
             </div>
           </div>
+        ) : liffStatus?.liffId ? (
+          <div className="space-y-2.5">
+            <div className="flex items-start gap-2.5">
+              <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                <Smartphone className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="text-sm font-bold text-slate-900">ต้องเข้าผ่านแอป LINE</div>
+                <p className="text-[11px] text-slate-500 leading-snug">
+                  เพื่อความปลอดภัย ระบบต้องยืนยันตัวตนผ่านบัญชี LINE ของคุณก่อน กดปุ่มด้านล่างเพื่อเข้าสู่ระบบด้วย LINE
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => LiffService.login()}
+                className="py-2.5 rounded-2xl bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-bold transition-colors cursor-pointer"
+              >
+                เข้าสู่ระบบด้วย LINE
+              </button>
+              <a
+                href={`https://liff.line.me/${liffStatus.liffId}`}
+                className="py-2.5 rounded-2xl border border-[#06C755] text-[#05963f] text-xs font-bold text-center hover:bg-[#06C755]/5 transition-colors"
+              >
+                เปิดในแอป LINE
+              </a>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-start gap-2.5 text-[11px] text-slate-500">
+            <AlertCircle className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+            <span>ยังไม่ได้ตั้งค่า LINE LIFF — ผู้ดูแลระบบต้องระบุ LIFF ID ก่อนจึงจะผูกบัญชี LINE ได้</span>
+          </div>
+        )}
+
+        <ol className="grid grid-cols-3 gap-2 text-center text-[10px] text-slate-500">
+          {[
+            { n: 1, label: 'เข้าสู่ระบบ LINE', done: !!liffProfile },
+            { n: 2, label: 'กรอกข้อมูลสมาชิก', done: false },
+            { n: 3, label: 'ครั้งหน้าเข้าอัตโนมัติ', done: false },
+          ].map((st) => (
+            <li key={st.n} className="space-y-1">
+              <span
+                className={`mx-auto w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold ${
+                  st.done ? 'bg-[#06C755] text-white' : 'bg-slate-100 text-slate-500'
+                }`}
+              >
+                {st.done ? <CheckCircle2 className="w-3.5 h-3.5" /> : st.n}
+              </span>
+              <span className="block leading-tight">{st.label}</span>
+            </li>
+          ))}
+        </ol>
+
+        <div className="text-right">
           <button
             type="button"
             onClick={onOpenLiffConfig}
-            className="text-[11px] text-emerald-700 hover:underline"
+            className="text-[11px] text-slate-400 hover:text-emerald-700 hover:underline cursor-pointer"
           >
             ตั้งค่า LIFF
           </button>
         </div>
-      )}
+      </div>
 
       {/* Login Card */}
       <div className="bg-white border border-slate-200 rounded-[2rem] p-6 shadow-xl shadow-slate-900/5">
