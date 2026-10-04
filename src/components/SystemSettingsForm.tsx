@@ -1,3 +1,4 @@
+import { BrandLogo } from './BrandLogo';
 import React, { useState, useEffect } from 'react';
 import { SystemSettings } from '../types';
 import { StorageService, DEFAULT_SYSTEM_SETTINGS } from '../services/storageService';
@@ -233,7 +234,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   type="text"
                   value={settings.cooperativeName}
                   onChange={(e) => updateField('cooperativeName', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -246,7 +247,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   type="text"
                   value={settings.registrationNumber}
                   onChange={(e) => updateField('registrationNumber', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -259,7 +260,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   type="text"
                   value={settings.contactPhone}
                   onChange={(e) => updateField('contactPhone', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -272,7 +273,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   type="email"
                   value={settings.contactEmail}
                   onChange={(e) => updateField('contactEmail', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -285,7 +286,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   rows={2}
                   value={settings.officeAddress}
                   onChange={(e) => updateField('officeAddress', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
               </div>
 
@@ -294,16 +295,12 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   URL ตราสัญลักษณ์ / โลโก้สหกรณ์:
                 </label>
                 <div className="flex items-center gap-3">
-                  <img
-                    src={settings.logoUrl}
-                    alt="Logo Preview"
-                    className="w-10 h-10 rounded-xl object-cover border border-slate-200"
-                  />
+                  <BrandLogo logoUrl={settings.logoUrl} className="w-12 h-12 shrink-0 border border-slate-200" />
                   <input
                     type="url"
                     value={settings.logoUrl}
                     onChange={(e) => updateField('logoUrl', e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono text-[11px]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono text-[11px]"
                   />
                 </div>
               </div>
@@ -486,7 +483,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   type="checkbox"
                   checked={settings.isServiceActive24h}
                   onChange={(e) => updateField('isServiceActive24h', e.target.checked)}
-                  className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 mt-0.5"
+                  className="appearance-none shrink-0 w-10 h-6 rounded-full bg-slate-300 checked:bg-indigo-600 relative cursor-pointer transition-colors before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:w-5 before:h-5 before:rounded-full before:bg-white before:shadow before:transition-transform checked:before:translate-x-4 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-1"
                 />
                 <div>
                   <span className="font-bold text-slate-900 block">
@@ -532,7 +529,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   type="checkbox"
                   checked={settings.allowWeekendTransactions}
                   onChange={(e) => updateField('allowWeekendTransactions', e.target.checked)}
-                  className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 mt-0.5"
+                  className="appearance-none shrink-0 w-10 h-6 rounded-full bg-slate-300 checked:bg-indigo-600 relative cursor-pointer transition-colors before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:w-5 before:h-5 before:rounded-full before:bg-white before:shadow before:transition-transform checked:before:translate-x-4 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-1"
                 />
                 <div>
                   <span className="font-bold text-slate-900 block">
@@ -551,7 +548,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                     type="checkbox"
                     checked={settings.isMaintenanceMode}
                     onChange={(e) => updateField('isMaintenanceMode', e.target.checked)}
-                    className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 mt-0.5"
+                    className="appearance-none shrink-0 w-10 h-6 rounded-full bg-slate-300 checked:bg-indigo-600 relative cursor-pointer transition-colors before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:w-5 before:h-5 before:rounded-full before:bg-white before:shadow before:transition-transform checked:before:translate-x-4 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-1"
                   />
                   <div>
                     <span className="font-bold text-rose-950 block">
@@ -618,7 +615,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   value={settings.lineOfficialId}
                   onChange={(e) => updateField('lineOfficialId', e.target.value)}
                   placeholder="@coop.development"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#06C755] focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#06C755] focus:outline-none"
                   required
                 />
               </div>
@@ -641,7 +638,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                       type="checkbox"
                       checked={settings.enableGlobalLinePush}
                       onChange={(e) => updateField('enableGlobalLinePush', e.target.checked)}
-                      className="w-4 h-4 rounded text-[#06C755] focus:ring-[#06C755]"
+                      className="appearance-none shrink-0 w-10 h-6 rounded-full bg-slate-300 checked:bg-indigo-600 relative cursor-pointer transition-colors before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:w-5 before:h-5 before:rounded-full before:bg-white before:shadow before:transition-transform checked:before:translate-x-4 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-1"
                     />
                     <span className="font-semibold text-slate-800">
                       เปิดระบบส่งสลิปและ Flex Message เข้า LINE ส่วนตัวของสมาชิกเมื่อมียอดเงินเปลี่ยนแปลง
@@ -653,7 +650,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                       type="checkbox"
                       checked={settings.notifyStaffOnPendingTxn}
                       onChange={(e) => updateField('notifyStaffOnPendingTxn', e.target.checked)}
-                      className="w-4 h-4 rounded text-[#06C755] focus:ring-[#06C755]"
+                      className="appearance-none shrink-0 w-10 h-6 rounded-full bg-slate-300 checked:bg-indigo-600 relative cursor-pointer transition-colors before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:w-5 before:h-5 before:rounded-full before:bg-white before:shadow before:transition-transform checked:before:translate-x-4 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-1"
                     />
                     <span className="font-semibold text-slate-800">
                       ส่งข้อความแจ้งเตือนเข้าห้องแชตเจ้าหน้าที่ทันทีเมื่อมีรายการรอการตรวจสอบและอนุมัติ
@@ -684,7 +681,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   type="checkbox"
                   checked={settings.requireDualSignatures}
                   onChange={(e) => updateField('requireDualSignatures', e.target.checked)}
-                  className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 mt-0.5"
+                  className="appearance-none shrink-0 w-10 h-6 rounded-full bg-slate-300 checked:bg-indigo-600 relative cursor-pointer transition-colors before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:w-5 before:h-5 before:rounded-full before:bg-white before:shadow before:transition-transform checked:before:translate-x-4 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-1"
                 />
                 <div>
                   <span className="font-bold text-slate-900 block">
@@ -701,7 +698,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   type="checkbox"
                   checked={settings.enableAiSlipVerification}
                   onChange={(e) => updateField('enableAiSlipVerification', e.target.checked)}
-                  className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 mt-0.5"
+                  className="appearance-none shrink-0 w-10 h-6 rounded-full bg-slate-300 checked:bg-indigo-600 relative cursor-pointer transition-colors before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:w-5 before:h-5 before:rounded-full before:bg-white before:shadow before:transition-transform checked:before:translate-x-4 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-1"
                 />
                 <div>
                   <span className="font-bold text-slate-900 block">

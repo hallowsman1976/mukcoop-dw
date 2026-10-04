@@ -39,18 +39,18 @@ export const OfficialWithdrawalSlipModal: React.FC<OfficialWithdrawalSlipModalPr
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto"
+      className="fixed inset-0 z-[60] bg-black/75 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4 overflow-y-auto"
       onClick={onClose}
     >
       {/* Modal Container */}
       <div
-        className="bg-white rounded-3xl max-w-4xl w-full overflow-hidden shadow-2xl my-4 sm:my-6 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[95vh]"
+        className="bg-white rounded-t-3xl sm:rounded-3xl max-w-4xl w-full overflow-hidden shadow-2xl sm:my-6 animate-in slide-in-from-bottom-6 sm:zoom-in-95 fade-in duration-150 flex flex-col max-h-[95vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Top Control Bar (Hidden when printing) */}
-        <div className="p-4 bg-slate-900 text-white flex items-center justify-between print:hidden">
+        <div className="p-4 bg-gradient-to-r from-indigo-700 to-slate-900 text-white flex items-center justify-between gap-2 print:hidden">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-indigo-300">
+            <div className="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center text-indigo-300">
               <FileCheck2 className="w-5 h-5 text-emerald-400" />
             </div>
             <div>
@@ -67,7 +67,7 @@ export const OfficialWithdrawalSlipModal: React.FC<OfficialWithdrawalSlipModalPr
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold text-xs rounded-xl shadow-md transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-white font-bold text-xs rounded-2xl shadow-md transition-all cursor-pointer"
             >
               <Printer className="w-4 h-4" />
               <span>พิมพ์ใบถอนเงิน (Print / PDF)</span>

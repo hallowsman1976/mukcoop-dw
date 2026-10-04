@@ -338,7 +338,7 @@ export const TransactionExportModal: React.FC<TransactionExportModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Banner */}
-        <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white p-5 sm:p-6 flex items-center justify-between">
+        <div className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white p-5 sm:p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-xs flex items-center justify-center text-emerald-300 border border-white/20">
               <FileSpreadsheet className="w-6 h-6 text-white" />
@@ -348,7 +348,7 @@ export const TransactionExportModal: React.FC<TransactionExportModalProps> = ({
                 <h3 className="text-base sm:text-lg font-bold">
                   ศูนย์ส่งออกรายงานธุรกรรม (Export Excel / CSV)
                 </h3>
-                <span className="text-[10px] bg-emerald-400 text-slate-900 font-bold px-2 py-0.5 rounded-full">
+                <span className="text-[10px] bg-white/20 border border-white/20 text-white font-bold px-2 py-0.5 rounded-full">
                   Monthly & Quarterly Reports
                 </span>
               </div>
@@ -385,7 +385,7 @@ export const TransactionExportModal: React.FC<TransactionExportModalProps> = ({
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                📅 ประจำเดือนนี้ (ต.ค. 2569)
+                ประจำเดือนนี้ (ต.ค. 2569)
               </button>
 
               <button
@@ -397,7 +397,7 @@ export const TransactionExportModal: React.FC<TransactionExportModalProps> = ({
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                📅 ประจำเดือนที่แล้ว (ก.ย.)
+                ประจำเดือนที่แล้ว (ก.ย.)
               </button>
 
               <button
@@ -409,7 +409,7 @@ export const TransactionExportModal: React.FC<TransactionExportModalProps> = ({
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                📊 ไตรมาส 4 (ต.ค.-ธ.ค.)
+                ไตรมาส 4 (ต.ค.-ธ.ค.)
               </button>
 
               <button
@@ -421,7 +421,7 @@ export const TransactionExportModal: React.FC<TransactionExportModalProps> = ({
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                📊 ไตรมาส 3 (ก.ค.-ก.ย.)
+                ไตรมาส 3 (ก.ค.-ก.ย.)
               </button>
 
               <button
@@ -433,7 +433,7 @@ export const TransactionExportModal: React.FC<TransactionExportModalProps> = ({
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                📊 ไตรมาส 2 (เม.ย.-มิ.ย.)
+                ไตรมาส 2 (เม.ย.-มิ.ย.)
               </button>
 
               <button
@@ -445,7 +445,7 @@ export const TransactionExportModal: React.FC<TransactionExportModalProps> = ({
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                📊 ไตรมาส 1 (ม.ค.-มี.ค.)
+                ไตรมาส 1 (ม.ค.-มี.ค.)
               </button>
 
               <button
@@ -457,7 +457,7 @@ export const TransactionExportModal: React.FC<TransactionExportModalProps> = ({
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                🗂 ข้อมูลทั้งหมด (All Time)
+                ข้อมูลทั้งหมด (All Time)
               </button>
 
               <button

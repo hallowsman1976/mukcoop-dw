@@ -98,6 +98,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'approvals' | 'accounts' | 'members' | 'loans' | 'import' | 'settings'>('overview');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [memberSearch, setMemberSearch] = useState<string>('');
 
   // Transaction Inspection Modal
   const [inspectingTxn, setInspectingTxn] = useState<TransactionRecord | null>(null);
@@ -225,6 +226,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   }, [transactions, statusFilter, searchTerm]);
 
   // Handle Approve Transaction
+  const filteredMembers = members.filter((m) => {
+    const q = memberSearch.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      m.memberId.includes(q) ||
+      m.fullName.toLowerCase().includes(q) ||
+      (m.contact || '').includes(q) ||
+      (m.phone || '').includes(q)
+    );
+  });
+
   const [adminActionError, setAdminActionError] = useState<string | null>(null);
 
   const handleApproveTxn = async (txn: TransactionRecord) => {
@@ -503,68 +515,79 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* SUBTAB 1: Overview and Analytics */}
       {activeSubTab === 'overview' && (
         <div className="space-y-6">
-          {/* Key Metric Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-2xs hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between text-slate-500 mb-2">
-                <span className="text-xs font-medium">สินทรัพย์สภาพคล่องรวมสหกรณ์</span>
-                <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                  <Wallet className="w-4 h-4" />
-                </div>
+          {/* Key Metric Stats */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
+            <div className="lg:col-span-1 relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white p-5 shadow-xl shadow-emerald-900/15">
+              <div className="absolute -top-12 -right-8 w-44 h-44 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+              <div className="relative flex items-center gap-2 text-xs text-emerald-100">
+                <Wallet className="w-4 h-4" /> สินทรัพย์สภาพคล่องรวมสหกรณ์
               </div>
-              <div className="text-2xl font-bold text-slate-900 font-mono tracking-tight">
-                ฿{formatCurrency(totalAssets)}
+              <div className="relative mt-2 text-3xl sm:text-4xl font-bold font-mono tracking-tight">
+                <span className="text-xl text-emerald-200 mr-1">฿</span>
+                {formatCurrency(totalAssets)}
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">
+              <p className="relative mt-2 text-[11px] text-emerald-100/90">
                 ครอบคลุม {accounts.length} บัญชี จากสมาชิก {members.length} ราย
               </p>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-2xs hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between text-slate-500 mb-2">
-                <span className="text-xs font-medium">ดอกเบี้ยสะสมรอจ่าย</span>
-                <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4" />
+            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              {[
+                {
+                  label: 'ดอกเบี้ยสะสมรอจ่าย',
+                  value: totalAccruedInterest,
+                  note: 'ยอดสะสมจากทุกบัญชีเงินฝาก',
+                  icon: TrendingUp,
+                  tone: 'text-amber-600',
+                  chip: 'bg-amber-50 text-amber-600',
+                },
+                {
+                  label: 'ยอดเงินฝากรวมทั้งระบบ',
+                  value: totalDepositsVolume,
+                  note: 'เงินไหลเข้าจากสมาชิกผ่านระบบ LINE LIFF',
+                  icon: ArrowDownLeft,
+                  tone: 'text-emerald-600',
+                  chip: 'bg-emerald-50 text-emerald-600',
+                },
+                {
+                  label: 'ยอดเงินถอนรวมทั้งระบบ',
+                  value: totalWithdrawalsVolume,
+                  note: 'การถอนเงินที่ได้รับการรับรองและมีลายเซ็น',
+                  icon: ArrowUpRight,
+                  tone: 'text-rose-600',
+                  chip: 'bg-rose-50 text-rose-600',
+                },
+              ].map(({ label, value, note, icon: Icon, tone, chip }) => (
+                <div
+                  key={label}
+                  className="bg-white border border-slate-200 rounded-3xl p-4 shadow-2xs hover:shadow-md transition-shadow flex flex-col justify-between"
+                >
+                  <div className="flex items-center justify-between text-slate-500 mb-2">
+                    <span className="text-xs font-medium">{label}</span>
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${chip}`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className={`text-xl font-bold font-mono tracking-tight ${tone}`}>฿{formatCurrency(value)}</div>
+                  <p className="text-[11px] text-slate-400 mt-1">{note}</p>
                 </div>
-              </div>
-              <div className="text-2xl font-bold text-amber-600 font-mono tracking-tight">
-                ฿{formatCurrency(totalAccruedInterest)}
-              </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                ยอดสะสมจากทุกบัญชีเงินฝาก
-              </p>
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-2xs hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between text-slate-500 mb-2">
-                <span className="text-xs font-medium">ยอดเงินฝากรวมทั้งระบบ</span>
-                <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                  <ArrowDownLeft className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="text-2xl font-bold text-emerald-600 font-mono tracking-tight">
-                ฿{formatCurrency(totalDepositsVolume)}
-              </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                เงินไหลเข้าจากสมาชิกผ่านระบบ LINE LIFF
-              </p>
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-2xs hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between text-slate-500 mb-2">
-                <span className="text-xs font-medium">ยอดเงินถอนรวมทั้งระบบ</span>
-                <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
-                  <ArrowUpRight className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="text-2xl font-bold text-rose-600 font-mono tracking-tight">
-                ฿{formatCurrency(totalWithdrawalsVolume)}
-              </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                การถอนเงินที่ได้รับการรับรองและมีลายเซ็น
-              </p>
+              ))}
             </div>
           </div>
+
+          {pendingCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('approvals')}
+              className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-amber-50 border border-amber-200 text-left hover:bg-amber-100/70 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2.5 text-sm font-semibold text-amber-900">
+                <Clock className="w-5 h-5 text-amber-600" />
+                มี {pendingCount} รายการรอการตรวจสอบและอนุมัติ
+              </span>
+              <span className="text-xs font-semibold text-amber-700">ไปที่ศูนย์อนุมัติ →</span>
+            </button>
+          )}
 
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -691,17 +714,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div
                   key={t.id}
                   onClick={() => setInspectingTxn(t)}
-                  className="py-3 flex items-center justify-between hover:bg-slate-50 px-2 rounded-xl transition-colors cursor-pointer"
+                  className="py-3 flex items-center justify-between hover:bg-slate-50 px-2 rounded-2xl transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs ${
+                      className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
                         t.type === 'deposit'
                           ? 'bg-emerald-100 text-emerald-700'
                           : 'bg-rose-100 text-rose-700'
                       }`}
                     >
-                      {t.type === 'deposit' ? '+' : '-'}
+                      {t.type === 'deposit' ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
@@ -1165,46 +1188,78 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
 
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="ค้นหาด้วยรหัสสมาชิก ชื่อ หรือเบอร์ติดต่อ"
+                value={memberSearch}
+                onChange={(e) => setMemberSearch(e.target.value)}
+                className="w-full pl-10 pr-3 py-3 text-sm bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+              />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-              {members.map((m) => (
-                <div key={m.memberId} className="p-4 rounded-2xl border border-slate-200 hover:border-indigo-300 transition-all bg-slate-50/50 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-200">
-                      รหัส {m.memberId}
-                    </span>
-                    <span className="text-[11px] text-slate-400">
-                      เข้าเป็นสมาชิก: {m.registeredDate}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2.5 pt-1">
-                    {m.avatarUrl ? (
-                      <img
-                        src={m.avatarUrl}
-                        alt={m.fullName}
-                        className="w-10 h-10 rounded-full object-cover border border-slate-200"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold">
-                        {m.fullName.charAt(0)}
+              {filteredMembers.map((m) => {
+                const owned = accounts.filter((a) => a.memberId === m.memberId);
+                const total = owned.reduce((s, a) => s + a.balance, 0);
+                return (
+                  <div
+                    key={m.memberId}
+                    className="p-4 rounded-3xl border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all bg-white space-y-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      {m.avatarUrl ? (
+                        <img
+                          src={m.avatarUrl}
+                          alt={m.fullName}
+                          className="w-12 h-12 rounded-full object-cover border border-slate-200"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 text-white flex items-center justify-center text-lg font-bold">
+                          {m.fullName.charAt(0)}
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-sm font-bold text-slate-900 truncate">{m.fullName}</h4>
+                        <p className="text-[11px] font-mono text-slate-500">{formatCitizenId(m.citizenId, true)}</p>
                       </div>
-                    )}
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-900">{m.fullName}</h4>
-                      <p className="text-[11px] font-mono text-slate-500">
-                        {formatCitizenId(m.citizenId, true)}
-                      </p>
+                      <span className="font-mono text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2 py-1 rounded-lg border border-indigo-100 shrink-0">
+                        {m.memberId}
+                      </span>
                     </div>
-                  </div>
 
-                  <div className="pt-2 border-t border-slate-200/60 text-[11px] text-slate-500 space-y-0.5">
-                    <div>ติดต่อ: {m.contact}</div>
-                    <div className="text-emerald-700 font-medium">
-                      บัญชีในระบบ: {accounts.filter((a) => a.memberId === m.memberId).length} บัญชี
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="rounded-2xl bg-emerald-50/70 px-3 py-2">
+                        <div className="text-[10px] text-emerald-700">{owned.length} บัญชี</div>
+                        <div className="font-mono font-bold text-emerald-700 text-sm">฿{formatCurrency(total)}</div>
+                      </div>
+                      <div className="rounded-2xl bg-slate-50 px-3 py-2">
+                        <div className="text-[10px] text-slate-500">สถานะ LINE</div>
+                        <div
+                          className={`text-xs font-semibold ${
+                            m.lineUserId || (m as Member & { lineLinked?: boolean }).lineLinked
+                              ? 'text-[#05963f]'
+                              : 'text-slate-400'
+                          }`}
+                        >
+                          {m.lineUserId || (m as Member & { lineLinked?: boolean }).lineLinked ? 'ผูกแล้ว' : 'ยังไม่ผูก'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-[11px] text-slate-400 flex items-center justify-between">
+                      <span>ติดต่อ: {m.contact || '-'}</span>
+                      <span>สมาชิกตั้งแต่ {m.registeredDate}</span>
                     </div>
                   </div>
+                );
+              })}
+              {filteredMembers.length === 0 && (
+                <div className="md:col-span-2 lg:col-span-3 py-10 text-center text-sm text-slate-400">
+                  ไม่พบสมาชิกที่ตรงกับคำค้นหา
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
