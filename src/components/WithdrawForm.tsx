@@ -15,8 +15,6 @@ import {
   Landmark,
   Building2,
   Percent,
-  Clock,
-  ShieldAlert,
 } from 'lucide-react';
 
 interface WithdrawFormProps {
@@ -255,225 +253,216 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
     })();
   };
 
+  const stepBadge = (n: number) => (
+    <span className="w-6 h-6 rounded-full bg-rose-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0">
+      {n}
+    </span>
+  );
+
+  const cardCls = 'bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3';
+  const inputCls =
+    'w-full text-sm bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 focus:ring-2 focus:ring-rose-500 focus:bg-white focus:outline-none';
+
   return (
-    <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-rose-600 via-rose-700 to-pink-700 text-white p-5 sm:p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center">
-              <ArrowUpRight className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-base font-bold">แบบฟอร์มการถอนเงินออนไลน์</h2>
-              <p className="text-xs text-rose-100">
-                ระบบสหกรณ์ออมทรัพย์ / กองทุนการเงิน (ยืนยันสิทธิ์สมาชิก {currentMember.memberId})
-              </p>
-            </div>
+    <div className="max-w-3xl mx-auto my-2 sm:my-4 space-y-4">
+      {/* Header */}
+      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-rose-600 via-rose-700 to-pink-800 text-white p-5 shadow-xl shadow-rose-900/15">
+        <div className="absolute -top-14 -right-8 w-48 h-48 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+        <div className="relative flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/20 flex items-center justify-center shrink-0">
+            <ArrowUpRight className="w-6 h-6" />
           </div>
-          <span className="text-xs bg-white/20 px-2.5 py-1 rounded-full font-medium">
-            ถอนเงิน (Withdrawal)
-          </span>
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold leading-tight">ถอนเงิน</h2>
+            <p className="text-xs text-rose-100/90 truncate">
+              {currentMember.fullName} • รหัสสมาชิก {currentMember.memberId}
+            </p>
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-6">
-        {/* Policy Conditions Callout Box */}
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/90 rounded-2xl p-4 text-xs space-y-2.5">
-          <div className="flex items-center gap-2 font-bold text-amber-950">
-            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>เงื่อนไขและระเบียบการถอนเงินสหกรณ์:</span>
+      {/* Policy summary (collapsed by default) */}
+      <details className="group bg-amber-50/70 border border-amber-200 rounded-3xl px-4 py-3 text-xs">
+        <summary className="flex items-center gap-2 font-bold text-amber-950 cursor-pointer list-none">
+          <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+          <span className="flex-1">เงื่อนไขและระเบียบการถอนเงิน</span>
+          <span className="text-[11px] font-medium text-amber-700 group-open:hidden">แตะเพื่อดู</span>
+        </summary>
+        <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2.5 text-[11px]">
+          <div className="p-2.5 rounded-2xl bg-white/80 border border-amber-200/60 space-y-1">
+            <span className="font-bold text-amber-900 flex items-center gap-1">
+              <Landmark className="w-3.5 h-3.5 text-amber-600" /> วงเงินถอนออนไลน์
+            </span>
+            <p className="text-slate-600 leading-relaxed">
+              ถอนได้ <strong>1,000 - 100,000 บาท/วัน</strong> (มากกว่า 100,000 บาท ต้องทำธุรกรรมที่สหกรณ์)
+            </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-[11px]">
-            <div className="p-2.5 rounded-xl bg-white/80 border border-amber-200/60 space-y-1">
-              <span className="font-bold text-amber-900 flex items-center gap-1">
-                <Landmark className="w-3.5 h-3.5 text-amber-600" />
-                1. วงเงินถอนออนไลน์
-              </span>
-              <p className="text-slate-600 leading-relaxed">
-                ถอนได้ <strong>1,000 - 100,000 บาท/วัน</strong> (มากกว่า 100,000 บาท ต้องทำธุรกรรมที่สหกรณ์)
-              </p>
-            </div>
-
-            <div className="p-2.5 rounded-xl bg-white/80 border border-amber-200/60 space-y-1">
-              <span className="font-bold text-teal-900 flex items-center gap-1">
-                <Percent className="w-3.5 h-3.5 text-teal-600" />
-                2. บัญชีออมทรัพย์พิเศษ
-              </span>
-              <p className="text-slate-600 leading-relaxed">
-                ถอนได้ฟรี <strong>1 ครั้ง/เดือน</strong> ครั้งที่ 2 คิดค่าธรรมเนียม <strong>ร้อยละ 3</strong> ของยอดถอน
-              </p>
-            </div>
-
-            <div className="p-2.5 rounded-xl bg-white/80 border border-amber-200/60 space-y-1">
-              <span className="font-bold text-emerald-900 flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                3. บัญชีออมทรัพย์ปกติ
-              </span>
-              <p className="text-slate-600 leading-relaxed">
-                ถอนได้ <strong>ไม่จำกัดครั้ง</strong> และ <strong>ไม่มีค่าธรรมเนียม</strong> (ฟรี 0 บาท)
-              </p>
-            </div>
+          <div className="p-2.5 rounded-2xl bg-white/80 border border-amber-200/60 space-y-1">
+            <span className="font-bold text-teal-900 flex items-center gap-1">
+              <Percent className="w-3.5 h-3.5 text-teal-600" /> ออมทรัพย์พิเศษ
+            </span>
+            <p className="text-slate-600 leading-relaxed">
+              ถอนฟรี <strong>1 ครั้ง/เดือน</strong> ครั้งที่ 2 คิดค่าธรรมเนียม <strong>ร้อยละ 3</strong>
+            </p>
+          </div>
+          <div className="p-2.5 rounded-2xl bg-white/80 border border-amber-200/60 space-y-1">
+            <span className="font-bold text-emerald-900 flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> ออมทรัพย์ปกติ
+            </span>
+            <p className="text-slate-600 leading-relaxed">
+              ถอนได้ <strong>ไม่จำกัดครั้ง</strong> ไม่มีค่าธรรมเนียม
+            </p>
           </div>
         </div>
+      </details>
 
-        {/* Section 1: ข้อมูลที่ถูกดึงโดยอัตโนมัติหลังจากเข้าสู่ระบบ */}
-        <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" /> ข้อมูลบัญชีที่ดึงโดยอัตโนมัติ
-            </span>
-            {memberAccounts.length > 1 && (
-              <span className="text-[11px] text-slate-500">
-                มี {memberAccounts.length} บัญชี (เลือกบัญชีที่ต้องการ)
-              </span>
-            )}
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Step 1: account */}
+        <section className={cardCls}>
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            {stepBadge(1)} เลือกบัญชีที่ต้องการถอน
+          </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {/* หมายเลขบัญชี */}
-            <div>
-              <label className="text-[11px] font-semibold text-slate-500 block mb-1">
-                หมายเลขบัญชี
-              </label>
-              {memberAccounts.length > 1 ? (
-                <select
-                  value={selectedAccountNo}
-                  onChange={(e) => setSelectedAccountNo(e.target.value)}
-                  className="w-full text-xs font-mono font-bold text-slate-900 bg-white border border-slate-300 rounded-xl px-2.5 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none"
-                >
-                  {memberAccounts.map((acc) => (
-                    <option key={acc.accountNo} value={acc.accountNo}>
-                      {formatAccountNo(acc.accountNo)} ({acc.accountType})
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <div className="text-xs font-mono font-bold text-slate-900 bg-white border border-slate-200 rounded-xl px-3 py-2">
-                  {currentAccount ? formatAccountNo(currentAccount.accountNo) : '-'}
-                </div>
-              )}
+          {memberAccounts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {memberAccounts.map((acc) => {
+                const active = currentAccount?.accountNo === acc.accountNo;
+                const special = acc.accountType === 'ออมทรัพย์พิเศษ';
+                return (
+                  <button
+                    key={acc.accountNo}
+                    type="button"
+                    onClick={() => setSelectedAccountNo(acc.accountNo)}
+                    className={`text-left rounded-2xl p-3.5 border-2 transition-all cursor-pointer ${
+                      active
+                        ? 'border-rose-500 bg-rose-50/60 shadow-sm'
+                        : 'border-slate-200 bg-white hover:border-rose-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                          special ? 'bg-slate-800 text-white' : 'bg-emerald-100 text-emerald-800'
+                        }`}
+                      >
+                        {acc.accountType}
+                      </span>
+                      <span
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          active ? 'border-rose-600 bg-rose-600' : 'border-slate-300'
+                        }`}
+                      >
+                        {active && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
+                      </span>
+                    </div>
+                    <div className="mt-2 font-mono text-sm font-bold text-slate-900 tracking-wide">
+                      {formatAccountNo(acc.accountNo)}
+                    </div>
+                    <div className="text-[11px] text-slate-500 truncate">{acc.accountName}</div>
+                    <div className="mt-1.5 text-xs text-slate-500">
+                      คงเหลือ{' '}
+                      <span className="font-mono font-bold text-slate-800">฿{formatCurrency(acc.balance)}</span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
+          ) : (
+            <p className="text-xs text-slate-500">ไม่พบบัญชีเงินฝากของสมาชิก</p>
+          )}
 
-            {/* ชื่อบัญชี */}
-            <div>
-              <label className="text-[11px] font-semibold text-slate-500 block mb-1">
-                ชื่อบัญชี
-              </label>
-              <div className="text-xs font-medium text-slate-900 bg-white border border-slate-200 rounded-xl px-3 py-2 truncate">
-                {currentAccount ? currentAccount.accountName : currentMember.fullName}
-              </div>
-            </div>
-
-            {/* ประเภทบัญชี & โควตา */}
-            <div>
-              <label className="text-[11px] font-semibold text-slate-500 block mb-1">
-                ประเภทบัญชี
-              </label>
-              <div className="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 flex items-center justify-between">
-                <span>{currentAccount?.accountType || 'ออมทรัพย์'}</span>
-                <span className="text-[10px] bg-white px-1.5 py-0.5 rounded text-slate-600">
-                  ดอกเบี้ย {currentAccount?.interestRate || 1.75}%
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Account Policy Quota Indicator */}
-          <div className="pt-2 border-t border-slate-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="text-slate-600 font-medium">สิทธิ์การถอนประจำเดือน:</span>
+          {/* Monthly right + daily quota */}
+          <div className="rounded-2xl bg-slate-50 border border-slate-200/80 p-3 space-y-2.5 text-xs">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-slate-600 font-medium">สิทธิ์ประจำเดือน:</span>
               {isSpecialSavings ? (
                 monthlyWithdrawalCount === 0 ? (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 font-semibold border border-teal-200 text-[11px]">
-                    <CheckCircle2 className="w-3 h-3 text-teal-600" />
-                    ถอนครั้งที่ 1 ของเดือน (ได้รับสิทธิ์ฟรีค่าธรรมเนียม)
+                    <CheckCircle2 className="w-3 h-3" /> ถอนครั้งที่ 1 ของเดือน (ฟรีค่าธรรมเนียม)
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 font-semibold border border-amber-300 text-[11px]">
-                    <AlertCircle className="w-3 h-3 text-amber-600" />
-                    ถอนครั้งที่ {monthlyWithdrawalCount + 1} ของเดือนนี้ (คิดค่าธรรมเนียม 3%)
+                    <AlertCircle className="w-3 h-3" /> ถอนครั้งที่ {monthlyWithdrawalCount + 1} ของเดือน (ค่าธรรมเนียม 3%)
                   </span>
                 )
               ) : (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200 text-[11px]">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                  ถอนได้ไม่จำกัดครั้ง (ไม่มีค่าธรรมเนียม)
+                  <CheckCircle2 className="w-3 h-3" /> ถอนได้ไม่จำกัดครั้ง (ไม่มีค่าธรรมเนียม)
                 </span>
               )}
             </div>
 
-            <div className="flex items-center gap-1.5">
-              <span className="text-slate-500 text-[11px]">ยอดเงินในบัญชี:</span>
-              <span className="text-sm font-bold text-emerald-700 font-mono">
-                ฿{formatCurrency(currentBalance)}
-              </span>
+            <div className="space-y-1">
+              <div className="flex justify-between items-center text-[11px] text-slate-500">
+                <span>วงเงินถอนออนไลน์วันนี้ (สูงสุด 100,000 บาท)</span>
+                <span className="font-mono font-semibold text-slate-700">
+                  เหลือ ฿{formatCurrency(remainingDailyQuota)}
+                </span>
+              </div>
+              <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-rose-400 to-rose-600 rounded-full transition-all"
+                  style={{ width: `${Math.min(100, (todayWithdrawn / dailyLimit) * 100)}%` }}
+                ></div>
+              </div>
+              <div className="text-[11px] text-slate-400">ถอนไปแล้ววันนี้ ฿{formatCurrency(todayWithdrawn)}</div>
             </div>
           </div>
+        </section>
 
-          {/* Daily Quota Progress Bar */}
-          <div className="pt-2 border-t border-slate-200/60 text-[11px] text-slate-500 space-y-1">
-            <div className="flex justify-between items-center">
-              <span>วงเงินถอนออนไลน์วันนี้ (จำกัด 100,000 บาท/วัน):</span>
-              <span className="font-mono font-semibold text-slate-700">
-                ถอนแล้ว ฿{formatCurrency(todayWithdrawn)} / คงเหลือ ฿{formatCurrency(remainingDailyQuota)}
-              </span>
-            </div>
-            <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-rose-500 rounded-full transition-all"
-                style={{ width: `${Math.min(100, (todayWithdrawn / dailyLimit) * 100)}%` }}
-              ></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Section 2: จำนวนเงินที่ถอน */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-              จำนวนเงินที่ถอน (บาท) <span className="text-rose-500">*</span>
-              <span className="text-[11px] font-normal text-slate-400">
-                (ขั้นต่ำ 1,000 - สูงสุด 100,000 บาท/วัน)
-              </span>
-            </label>
+        {/* Step 2: amount */}
+        <section className={cardCls}>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              {stepBadge(2)} จำนวนเงินที่ถอน <span className="text-rose-500">*</span>
+            </h3>
             <button
               type="button"
               onClick={handleWithdrawAll}
-              className="text-xs text-rose-600 hover:text-rose-700 font-medium underline cursor-pointer"
+              className="text-xs text-rose-600 hover:text-rose-700 font-semibold cursor-pointer"
             >
-              ถอนสูงสุดที่ทำได้ (฿{formatCurrency(Math.min(currentBalance, remainingDailyQuota))})
+              ถอนสูงสุด ฿{formatCurrency(Math.min(currentBalance, remainingDailyQuota))}
             </button>
           </div>
 
-          <div className="relative">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-lg font-bold text-slate-400">
-              ฿
-            </span>
+          <div className="rounded-2xl bg-slate-50 border border-slate-200 focus-within:border-rose-500 focus-within:ring-4 focus-within:ring-rose-500/10 focus-within:bg-white transition-all px-4 py-3 flex items-baseline justify-center gap-2">
+            <span className="text-2xl font-bold text-slate-400">฿</span>
             <input
               type="text"
               inputMode="decimal"
-              placeholder="1,000 - 100,000"
+              placeholder="0.00"
               value={amountInput}
               onChange={handleAmountChange}
-              className="w-full pl-9 pr-4 py-3 text-lg font-mono font-bold text-slate-900 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white transition-all tracking-wide"
+              className="w-full min-w-0 text-center text-4xl font-bold font-mono text-slate-900 bg-transparent focus:outline-none placeholder:text-slate-300"
               required
             />
           </div>
+          <p className="text-center text-[11px] text-slate-400">ขั้นต่ำ 1,000 - สูงสุด 100,000 บาท/วัน</p>
 
-          {/* Thai Baht text representation */}
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {quickAmounts.map((amt) => (
+              <button
+                key={amt}
+                type="button"
+                onClick={() => handleSelectQuickAmount(amt)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold border transition-all active:scale-95 cursor-pointer ${
+                  numericAmount === amt
+                    ? 'bg-rose-600 border-rose-600 text-white'
+                    : 'bg-white border-slate-200 text-slate-700 hover:border-rose-400 hover:text-rose-700'
+                }`}
+              >
+                {amt.toLocaleString()}
+              </button>
+            ))}
+          </div>
+
           {numericAmount > 0 && (
-            <div className="p-2.5 rounded-xl bg-slate-100/70 border border-slate-200 text-xs text-slate-700 flex items-start gap-1.5">
+            <div className="p-2.5 rounded-xl bg-slate-100/70 text-xs text-slate-700 flex items-start gap-1.5">
               <Info className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
-              <div>
-                <span className="font-semibold text-slate-800">จำนวนเงินตัวอักษร:</span>{' '}
-                <span className="text-rose-800 font-medium">{thaiBahtText(numericAmount)}</span>
-              </div>
+              <span className="text-rose-800 font-medium">{thaiBahtText(numericAmount)}</span>
             </div>
           )}
 
-          {/* Alert if amount > 100,000 THB */}
           {numericAmount > 100000 && (
             <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs space-y-1.5 animate-in fade-in duration-150">
               <div className="font-bold flex items-center gap-1.5 text-amber-950">
@@ -486,92 +475,58 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
             </div>
           )}
 
-          {/* Quick Amount Buttons */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] text-slate-400 mr-1">จำนวนด่วน:</span>
-            {quickAmounts.map((amt) => (
-              <button
-                key={amt}
-                type="button"
-                onClick={() => handleSelectQuickAmount(amt)}
-                className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg text-xs font-mono transition-all cursor-pointer"
-              >
-                +{amt.toLocaleString()}
-              </button>
-            ))}
-          </div>
-
-          {/* Dynamic Fee & Net Deduction Breakdown Card */}
           {numericAmount > 0 && (
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
-              <div className="flex justify-between items-center text-slate-600">
-                <span>ยอดเงินที่ขอถอน:</span>
-                <span className="font-mono font-bold text-slate-900">
-                  ฿{formatCurrency(numericAmount)}
-                </span>
+            <div className="rounded-2xl border border-slate-200 divide-y divide-slate-200 text-xs overflow-hidden">
+              <div className="flex justify-between items-center px-3.5 py-2.5 text-slate-600">
+                <span>ยอดเงินที่ขอถอน</span>
+                <span className="font-mono font-bold text-slate-900">฿{formatCurrency(numericAmount)}</span>
               </div>
-
-              <div className="flex justify-between items-center">
-                <span className="flex items-center gap-1 text-slate-600">
-                  <span>ค่าธรรมเนียมการถอน</span>
+              <div className="flex justify-between items-center px-3.5 py-2.5">
+                <span className="flex items-center gap-1.5 text-slate-600">
+                  ค่าธรรมเนียม
                   {feeRate > 0 ? (
                     <span className="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 font-semibold">
-                      3% (ออมทรัพย์พิเศษครั้งที่ {monthlyWithdrawalCount + 1})
+                      3% (ครั้งที่ {monthlyWithdrawalCount + 1})
                     </span>
                   ) : (
                     <span className="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 font-semibold">
-                      ฟรี (0 บาท)
+                      ฟรี
                     </span>
                   )}
-                  :
                 </span>
-                <span
-                  className={`font-mono font-bold ${
-                    fee > 0 ? 'text-amber-700' : 'text-emerald-700'
-                  }`}
-                >
+                <span className={`font-mono font-bold ${fee > 0 ? 'text-amber-700' : 'text-emerald-700'}`}>
                   ฿{formatCurrency(fee)}
                 </span>
               </div>
-
-              <div className="flex justify-between items-center border-t border-slate-200 pt-2 text-slate-900 font-bold">
-                <span>ยอดรวมที่หักจากบัญชี (ยอดถอน + ค่าธรรมเนียม):</span>
-                <span className="font-mono text-rose-700 text-sm">
-                  ฿{formatCurrency(totalDeduction)}
-                </span>
+              <div className="flex justify-between items-center px-3.5 py-3 bg-rose-50 text-slate-900 font-bold">
+                <span>ยอดรวมที่หักจากบัญชี</span>
+                <span className="font-mono text-rose-700 text-base">฿{formatCurrency(totalDeduction)}</span>
               </div>
-
-              <div className="flex justify-between items-center pt-1 border-t border-slate-200/60 text-[11px]">
-                <span className="text-slate-500">ยอดเงินคงเหลือสุทธิหลังถอน:</span>
-                <span
-                  className={`font-mono font-bold ${
-                    remainingBalance < 0 ? 'text-rose-600' : 'text-emerald-700'
-                  }`}
-                >
+              <div className="flex justify-between items-center px-3.5 py-2.5 text-[11px]">
+                <span className="text-slate-500">คงเหลือสุทธิหลังถอน</span>
+                <span className={`font-mono font-bold ${remainingBalance < 0 ? 'text-rose-600' : 'text-emerald-700'}`}>
                   ฿{formatCurrency(remainingBalance)}
                 </span>
               </div>
             </div>
           )}
-        </div>
+        </section>
 
-        {/* Section 3: โอนเข้าบัญชี และ ชื่อบัญชี */}
-        <div className="space-y-3 pt-2 border-t border-slate-100">
-          <h3 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-            <Landmark className="w-4 h-4 text-rose-600" />
-            ข้อมูลบัญชีปลายทางสำหรับรับเงินโอน
+        {/* Step 3: destination */}
+        <section className={cardCls}>
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            {stepBadge(3)} บัญชีปลายทางสำหรับรับเงินโอน
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {/* โอนเข้าธนาคาร */}
             <div>
               <label className="text-[11px] font-semibold text-slate-600 block mb-1">
-                ธนาคารปลายทาง <span className="text-rose-500">*</span>
+                ธนาคาร <span className="text-rose-500">*</span>
               </label>
               <select
                 value={destinationBank}
                 onChange={(e) => setDestinationBank(e.target.value)}
-                className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2.5 focus:ring-2 focus:ring-rose-500 focus:outline-none"
+                className={inputCls}
               >
                 {THAI_BANKS.map((b) => (
                   <option key={b.id} value={b.name}>
@@ -580,58 +535,54 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
                 ))}
               </select>
             </div>
-
-            {/* เลขที่บัญชีปลายทาง */}
             <div>
               <label className="text-[11px] font-semibold text-slate-600 block mb-1">
-                เลขที่บัญชีปลายทาง <span className="text-rose-500">*</span>
+                เลขที่บัญชี <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
+                inputMode="numeric"
                 placeholder="เช่น 123-4-56789-0"
                 value={destinationAccountNo}
                 onChange={(e) => setDestinationAccountNo(e.target.value)}
-                className="w-full text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-rose-500 focus:outline-none"
+                className={`${inputCls} font-mono`}
                 required
               />
             </div>
-
-            {/* ชื่อบัญชีปลายทาง */}
             <div>
               <label className="text-[11px] font-semibold text-slate-600 block mb-1">
-                ชื่อบัญชีปลายทาง <span className="text-rose-500">*</span>
+                ชื่อบัญชี <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
                 value={destinationAccountName}
                 onChange={(e) => setDestinationAccountName(e.target.value)}
-                className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-rose-500 focus:outline-none"
+                className={inputCls}
                 required
               />
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Section 4: แนบเอกสารหลักฐานสำคัญ (3 จุดตามแบบฟอร์มสหกรณ์) */}
-        <div className="space-y-3 pt-2 border-t border-slate-100">
+        {/* Step 4: documents */}
+        <section className={cardCls}>
           <div>
-            <h3 className="text-xs font-bold text-slate-800">
-              แนบเอกสารหลักฐานสำคัญประกอบการถอนเงิน <span className="text-rose-500">*</span>
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              {stepBadge(4)} แนบเอกสารประกอบ <span className="text-rose-500">*</span>
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              กรุณาอัปโหลดเอกสารทั้ง 3 รายการเพื่อประกอบการจัดทำใบถอนเงินออนไลน์ทางการ
+            <p className="text-[11px] text-slate-400 mt-1 ml-8">
+              อัปโหลดเอกสารทั้ง 3 รายการเพื่อจัดทำใบถอนเงินออนไลน์
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <FileUpload
               label="1. แนบบัตรประชาชน"
-              helperText="สำเนาบัตรประชาชนตัวจริง (วางตรงหรือเอียงแนวนี้ได้)"
+              helperText="สำเนาบัตรประชาชนตัวจริง"
               value={idCardFile}
               onChange={setIdCardFile}
               required
             />
-
             <FileUpload
               label="2. แนบสมุดบัญชีสหกรณ์"
               helperText="หน้าสมุดบัญชีเงินฝากสหกรณ์ต้นทาง"
@@ -639,31 +590,28 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
               onChange={setSourcePassbookFile}
               required
             />
-
             <FileUpload
-              label="3. แนบสมุดบัญชีเงินฝากธนาคาร"
-              helperText="หน้าสมุดบัญชีธนาคารปลายทางรับเงินโอน"
+              label="3. แนบสมุดบัญชีธนาคาร"
+              helperText="หน้าสมุดบัญชีธนาคารปลายทาง"
               value={destinationPassbookFile}
               onChange={setDestinationPassbookFile}
               required
             />
           </div>
-        </div>
+        </section>
 
-        {/* Section 5: ลายมือชื่ออิเล็กทรอนิกส์ (Digital Signature) */}
-        <div className="space-y-4 pt-2 border-t border-slate-100">
+        {/* Step 5: signatures and note */}
+        <section className={cardCls}>
           <div>
-            <h3 className="text-xs font-bold text-slate-800">
-              ลายมือชื่ออิเล็กทรอนิกส์ (Digital Signatures){' '}
-              <span className="text-rose-500">*</span>
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              {stepBadge(5)} ลายมือชื่ออิเล็กทรอนิกส์ <span className="text-rose-500">*</span>
             </h3>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              ลงลายมือชื่อด้วยนิ้วหรือปากกา Stylus ลงบนหน้าจอเพื่อใช้ประทับบนใบถอนเงินออนไลน์
+            <p className="text-[11px] text-slate-400 mt-1 ml-8">
+              ลงลายมือชื่อด้วยนิ้วหรือปากกา Stylus เพื่อประทับบนใบถอนเงิน
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Signature 1: ลายมือชื่อเจ้าของบัญชี */}
             <div>
               <SignaturePad
                 label="ลายมือชื่อเจ้าของบัญชี"
@@ -674,19 +622,16 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
               />
             </div>
 
-            {/* Signature 2: ลายมือชื่อผู้รับเงิน */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between pb-1">
-                <label className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={sameAsOwner}
-                    onChange={(e) => setSameAsOwner(e.target.checked)}
-                    className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500"
-                  />
-                  <span>ผู้รับเงินเป็นคนเดียวกับเจ้าของบัญชี</span>
-                </label>
-              </div>
+              <label className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer pb-1">
+                <input
+                  type="checkbox"
+                  checked={sameAsOwner}
+                  onChange={(e) => setSameAsOwner(e.target.checked)}
+                  className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500"
+                />
+                <span>ผู้รับเงินเป็นคนเดียวกับเจ้าของบัญชี</span>
+              </label>
 
               {!sameAsOwner ? (
                 <SignaturePad
@@ -709,23 +654,16 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
               )}
             </div>
           </div>
-        </div>
 
-        {/* Section 6: บันทึกข้อความเพิ่มเติม */}
-        <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-700 block">
-            บันทึกช่วยจำ / วัตถุประสงค์การถอน (ไม่บังคับ):
-          </label>
           <input
             type="text"
-            placeholder="เช่น ค่าใช้จ่ายประจำเดือน, ค่ารักษาพยาบาล, ชำระหนี้สิน"
+            placeholder="บันทึกช่วยจำ / วัตถุประสงค์การถอน (ไม่บังคับ)"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-rose-500 focus:outline-none"
+            className={inputCls}
           />
-        </div>
+        </section>
 
-        {/* Error message */}
         {error && (
           <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-2.5 text-xs text-rose-700 animate-in fade-in duration-150">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
@@ -733,42 +671,36 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
           </div>
         )}
 
-        {/* Actions Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-200">
-          <div className="text-xs text-slate-400 text-center sm:text-left">
-            * ยอดเงินจะถูกหักจากบัญชีและบันทึกลงในทะเบียนธุรกรรมสหกรณ์ทันที
-          </div>
-
-          <div className="flex items-center gap-2.5 w-full sm:w-auto">
+        <div className="space-y-2">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-semibold transition-colors cursor-pointer"
+              className="px-5 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
             >
               ยกเลิก
             </button>
-
             <button
               type="submit"
               disabled={isSubmitting || numericAmount < 1000 || numericAmount > 100000}
-              className="flex-1 sm:flex-initial px-6 py-2.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-semibold rounded-xl shadow-md shadow-rose-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white text-sm font-bold rounded-2xl shadow-lg shadow-rose-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <>
-                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  <span>กำลังบันทึกรายการ...</span>
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  <span>กำลังบันทึก...</span>
                 </>
               ) : (
                 <>
                   <ArrowUpRight className="w-4 h-4" />
-                  <span>
-                    ยืนยันการถอนเงิน ฿
-                    {numericAmount > 0 ? formatCurrency(totalDeduction) : '0.00'}
-                  </span>
+                  <span>ยืนยันการถอนเงิน ฿{numericAmount > 0 ? formatCurrency(totalDeduction) : '0.00'}</span>
                 </>
               )}
             </button>
           </div>
+          <p className="text-[11px] text-slate-400 text-center sm:text-right">
+            ยอดเงินจะถูกหักจากบัญชีและบันทึกลงในทะเบียนธุรกรรมสหกรณ์ทันที
+          </p>
         </div>
       </form>
     </div>

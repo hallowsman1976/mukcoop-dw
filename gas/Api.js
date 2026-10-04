@@ -47,6 +47,7 @@ const HANDLERS = {
   ping: function () { return { status: 'ONLINE' }; },
   getPublicSettings: function () { return getSettings_(); },
   memberLogin: function (p) { return memberLogin_(p); },
+  memberLoginByLine: function (p) { return memberLoginByLine_(p); },
   adminLogin: function (p) { return adminLogin_(p); },
   logout: function (p, token) { destroySession_(token); return { ok: true }; },
 

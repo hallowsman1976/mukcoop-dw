@@ -35,6 +35,16 @@ import {
   Lock,
 } from 'lucide-react';
 
+const SKIP_AUTO_LOGIN_KEY = 'coop_skip_auto_login_v1';
+
+function readSkipAutoLogin(): boolean {
+  try {
+    return sessionStorage.getItem(SKIP_AUTO_LOGIN_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export default function App() {
   const [currentMember, setCurrentMember] = useState<Member | null>(null);
   const [currentAdmin, setCurrentAdmin] = useState<AdminUser | null>(null);
@@ -66,6 +76,8 @@ export default function App() {
   } | null>(null);
 
   const [mustChangePassword, setMustChangePassword] = useState(false);
+  // True until the first session restore / LINE auto sign-in attempt finishes (avoids flashing the login form).
+  const [booting, setBooting] = useState(true);
 
   const [brand, setBrand] = useState({ logoUrl: '', coopName: '', lineOfficialId: '' });
 
@@ -112,8 +124,21 @@ export default function App() {
         setViewMode('member');
       } else if (await StorageService.restoreAdminSession(StorageService.getStoredAdminProfile())) {
         setViewMode('admin');
+      } else if (!readSkipAutoLogin()) {
+        // LINE account already linked to a member -> sign in without typing member / citizen ID.
+        const idToken = LiffService.getIdToken();
+        if (idToken) {
+          try {
+            const member = await StorageService.loginMemberByLine(idToken);
+            setViewMode('member');
+            showNotification(`ยินดีต้อนรับคุณ ${member.fullName} (รหัสสมาชิก ${member.memberId})`);
+          } catch {
+            // not linked yet (or LINE token rejected): fall back to the normal login form
+          }
+        }
       }
       syncFromCache();
+      setBooting(false);
     })();
   }, []);
 
@@ -125,6 +150,12 @@ export default function App() {
   };
 
   const handleLogout = async () => {
+    // Explicit sign-out: do not silently sign the same LINE account back in on the next load.
+    try {
+      sessionStorage.setItem(SKIP_AUTO_LOGIN_KEY, '1');
+    } catch {
+      // storage unavailable
+    }
     await StorageService.logoutMember();
     syncFromCache();
     setActiveTab('dashboard');
@@ -255,7 +286,11 @@ export default function App() {
           )
         ) : (
           // Member View: Member Login or Member Dashboard / Features
-          !currentMember ? (
+          !currentMember && booting ? (
+            <div className="flex items-center justify-center py-24">
+              <span className="w-8 h-8 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></span>
+            </div>
+          ) : !currentMember ? (
             // Login / Identity Verification View
             <div className="space-y-6">
               <LoginForm

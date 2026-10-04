@@ -186,6 +186,20 @@ function memberLogin_(p) {
   return { token: token, member: publicMember_(member) };
 }
 
+/**
+ * Sign in a member whose LINE account is already linked: the LIFF ID token proves the LINE user,
+ * so no member ID / citizen ID is needed. Unlinked (or ambiguous) accounts must use memberLogin.
+ */
+function memberLoginByLine_(p) {
+  if (!p.idToken) throw new ApiError('NOT_LINKED', 'ยังไม่ได้ผูกบัญชี LINE กับสมาชิก');
+  const lineUserId = verifyLiffIdToken_(String(p.idToken));
+  const matches = readAll_('Members').filter(function (m) { return m.lineUserId === lineUserId; });
+  if (matches.length !== 1) throw new ApiError('NOT_LINKED', 'ยังไม่ได้ผูกบัญชี LINE กับสมาชิก');
+  const member = matches[0];
+  const token = createSession_({ role: 'member', memberId: member.memberId }, 6 * 3600);
+  return { token: token, member: publicMember_(member) };
+}
+
 function publicMember_(m) {
   const out = stripRow_(m);
   out.lineLinked = !!m.lineUserId;

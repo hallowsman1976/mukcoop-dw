@@ -63,6 +63,24 @@ test('member login: wrong citizen id fails, throttles after 5 tries', () => {
   assert.strictEqual(env.call('memberLogin', { memberId: '128', citizenId: '1101700230678' }).code, 'LOCKED');
 });
 
+test('LINE auto login: linked LINE user gets a session without member/citizen id', () => {
+  const { env } = boot();
+  env.props.LINE_LOGIN_CHANNEL_ID = 'chan';
+  env.lineVerify = (p) => ({ sub: p.id_token });
+  const r = env.call('memberLoginByLine', { idToken: 'Uabc' });
+  assert.ok(r.ok, JSON.stringify(r));
+  assert.strictEqual(r.data.member.memberId, '00128');
+  assert.ok(env.call('getMyData', {}, r.data.token).ok);
+});
+
+test('LINE auto login: unlinked LINE user or missing token is refused', () => {
+  const { env } = boot();
+  env.props.LINE_LOGIN_CHANNEL_ID = 'chan';
+  env.lineVerify = (p) => ({ sub: p.id_token });
+  assert.strictEqual(env.call('memberLoginByLine', { idToken: 'Unobody' }).code, 'NOT_LINKED');
+  assert.strictEqual(env.call('memberLoginByLine', {}).code, 'NOT_LINKED');
+});
+
 test('member login without LINE is refused unless sandbox flag is on', () => {
   const { env } = boot();
   delete env.props.ALLOW_SANDBOX_MEMBER_AUTH;
