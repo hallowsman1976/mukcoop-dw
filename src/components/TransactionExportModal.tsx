@@ -330,11 +330,11 @@ export const TransactionExportModal: React.FC<TransactionExportModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+      className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl my-6 animate-in fade-in zoom-in-95 duration-150"
+        className="bg-white rounded-t-3xl sm:rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl sm:my-6 animate-in slide-in-from-bottom-6 sm:zoom-in-95 fade-in duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Banner */}

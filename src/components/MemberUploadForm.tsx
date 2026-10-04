@@ -385,9 +385,9 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
   const duplicateCount = parsedRows.filter((r) => r.isDuplicate).length;
 
   return (
-    <div className="max-w-4xl mx-auto my-4 bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
+    <div className="max-w-4xl mx-auto my-2 sm:my-4 bg-white border border-slate-200 rounded-[2rem] shadow-sm overflow-hidden">
       {/* Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 text-white p-5 sm:p-6">
+      <div className="bg-gradient-to-br from-indigo-700 via-indigo-800 to-slate-900 text-white p-5 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-xs flex items-center justify-center text-indigo-300 border border-white/20">

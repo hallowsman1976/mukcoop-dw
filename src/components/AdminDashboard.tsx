@@ -41,6 +41,7 @@ import {
   Legend,
 } from 'recharts';
 import {
+  LayoutDashboard,
   ShieldAlert,
   Users,
   Wallet,
@@ -398,147 +399,104 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </button>
         </div>
       )}
-      {/* Admin Top Navigation & Header */}
-      <div className="bg-slate-900 text-white rounded-3xl p-5 sm:p-6 shadow-md border border-slate-800 relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
+      {/* Admin header */}
+      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-indigo-700 via-indigo-800 to-slate-900 text-white p-5 sm:p-6 shadow-xl shadow-indigo-950/20">
+        <div className="absolute -top-20 -right-10 w-72 h-72 rounded-full bg-white/10 blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-24 -left-10 w-64 h-64 rounded-full bg-blue-400/20 blur-3xl pointer-events-none"></div>
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             {currentAdmin.avatarUrl ? (
               <img
                 src={currentAdmin.avatarUrl}
                 alt={currentAdmin.fullName}
-                className="w-12 h-12 rounded-2xl object-cover border-2 border-indigo-400/40 shadow-sm"
+                className="w-12 h-12 rounded-2xl object-cover ring-2 ring-white/30 shrink-0"
               />
             ) : (
-              <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center font-bold text-lg">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 ring-2 ring-white/20 flex items-center justify-center font-bold text-lg shrink-0">
                 {currentAdmin.fullName.charAt(0)}
               </div>
             )}
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm sm:text-base font-bold text-white">{currentAdmin.fullName}</span>
-                <span className="text-[10px] bg-indigo-500/30 text-indigo-300 border border-indigo-400/40 font-semibold px-2 py-0.5 rounded-full uppercase">
-                  {currentAdmin.role === 'superadmin' ? 'ผู้จัดการระบบ (Super Admin)' : 'เจ้าหน้าที่การเงิน'}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-base font-bold truncate">{currentAdmin.fullName}</span>
+                <span className="text-[10px] bg-white/15 border border-white/20 font-semibold px-2 py-0.5 rounded-full">
+                  {currentAdmin.role === 'superadmin' ? 'Super Admin' : 'เจ้าหน้าที่การเงิน'}
                 </span>
               </div>
-              <p className="text-xs text-slate-300 mt-0.5">
-                {currentAdmin.department} • เข้าสู่ระบบเมื่อ: {new Date().toLocaleTimeString('th-TH')}
+              <p className="text-xs text-indigo-100/80 mt-0.5 truncate">
+                {currentAdmin.department} • เข้าสู่ระบบเมื่อ {new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={onOpenGasModal}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold border border-white/15 transition-colors cursor-pointer"
+              title="ซิงค์ Google Sheets / Apps Script"
             >
-              <FileSpreadsheet className="w-3.5 h-3.5 text-blue-400" />
-              <span>ซิงค์ Google Sheets / Apps Script</span>
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Google Sheets</span>
             </button>
-
             <button
               type="button"
               onClick={onSwitchToMemberView}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white transition-colors shadow-sm"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-xs font-semibold text-white transition-colors cursor-pointer"
             >
               <Users className="w-3.5 h-3.5" />
-              <span>ไปยังหน้าพอร์ทัลสมาชิก</span>
+              <span>พอร์ทัลสมาชิก</span>
             </button>
-
             <button
               type="button"
               onClick={onLogoutAdmin}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-rose-950 hover:text-rose-200 text-xs font-medium text-slate-300 border border-slate-700 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-rose-500/80 text-xs font-medium border border-white/15 transition-colors cursor-pointer"
               title="ออกจากระบบเจ้าหน้าที่"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>ออกจากระบบ</span>
+              <span className="hidden sm:inline">ออกจากระบบ</span>
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Sub Navigation Bar inside Admin */}
-        <div className="mt-5 pt-4 border-t border-slate-800 flex items-center gap-2 overflow-x-auto scrollbar-none">
-          <button
-            onClick={() => setActiveSubTab('overview')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-              activeSubTab === 'overview'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            ภาพรวมและสถิติการเงิน
-          </button>
-          <button
-            onClick={() => setActiveSubTab('approvals')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeSubTab === 'approvals'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <span>ศูนย์ตรวจสอบและอนุมัติธุรกรรม</span>
-            {pendingCount > 0 && (
-              <span className="bg-amber-500 text-slate-900 text-[10px] font-bold px-1.5 py-0.2 rounded-full">
-                {pendingCount}
-              </span>
-            )}
-          </button>
-          <button
-            onClick={() => setActiveSubTab('accounts')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-              activeSubTab === 'accounts'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            จัดการบัญชีเงินฝากทั้งหมด ({accounts.length})
-          </button>
-          <button
-            onClick={() => setActiveSubTab('members')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-              activeSubTab === 'members'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            รายชื่อสมาชิก ({members.length})
-          </button>
-          <button
-            onClick={() => setActiveSubTab('loans')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-              activeSubTab === 'loans'
-                ? 'bg-indigo-600 text-white shadow-xs font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <Coins className="w-3.5 h-3.5 text-indigo-300" />
-            <span>สินเชื่อและหนี้คงค้าง (Loans)</span>
-          </button>
-          <button
-            onClick={() => setActiveSubTab('import')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeSubTab === 'import'
-                ? 'bg-emerald-500 text-slate-900 shadow-xs font-bold'
-                : 'text-emerald-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <Upload className="w-3.5 h-3.5" />
-            <span>นำเข้าสมาชิกด้วย CSV (Bulk Import)</span>
-          </button>
-          <button
-            onClick={() => setActiveSubTab('settings')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-              activeSubTab === 'settings'
-                ? 'bg-indigo-600 text-white shadow-xs font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <Settings className="w-3.5 h-3.5" />
-            <span>ตั้งค่าระบบ (Settings)</span>
-          </button>
+      {/* Section navigation */}
+      <div className="sticky top-[65px] z-30 -mx-4 sm:mx-0 px-4 sm:px-0 py-2 bg-slate-50/90 backdrop-blur-md">
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none p-1.5 bg-white border border-slate-200 rounded-2xl shadow-2xs">
+          {([
+            { id: 'overview', label: 'ภาพรวม', icon: LayoutDashboard, badge: 0 },
+            { id: 'approvals', label: 'อนุมัติธุรกรรม', icon: FileCheck2, badge: pendingCount },
+            { id: 'accounts', label: `บัญชี (${accounts.length})`, icon: Wallet, badge: 0 },
+            { id: 'members', label: `สมาชิก (${members.length})`, icon: Users, badge: 0 },
+            { id: 'loans', label: 'สินเชื่อ', icon: Coins, badge: 0 },
+            { id: 'import', label: 'นำเข้า CSV', icon: Upload, badge: 0 },
+            { id: 'settings', label: 'ตั้งค่า', icon: Settings, badge: 0 },
+          ] as const).map(({ id, label, icon: Icon, badge }) => {
+            const active = activeSubTab === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setActiveSubTab(id)}
+                className={`shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  active ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{label}</span>
+                {badge > 0 && (
+                  <span
+                    className={`text-[10px] font-bold px-1.5 rounded-full ${
+                      active ? 'bg-white text-indigo-700' : 'bg-amber-500 text-white'
+                    }`}
+                  >
+                    {badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -547,7 +505,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="space-y-6">
           {/* Key Metric Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-2xs">
+            <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-2xs hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between text-slate-500 mb-2">
                 <span className="text-xs font-medium">สินทรัพย์สภาพคล่องรวมสหกรณ์</span>
                 <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -562,7 +520,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </p>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-2xs">
+            <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-2xs hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between text-slate-500 mb-2">
                 <span className="text-xs font-medium">ดอกเบี้ยสะสมรอจ่าย</span>
                 <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -573,11 +531,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 ฿{formatCurrency(totalAccruedInterest)}
               </div>
               <p className="text-[11px] text-slate-400 mt-1">
-                คำนวณตามอัตราผลตอบแทนเฉลี่ย 1.75 - 2.75%
+                ยอดสะสมจากทุกบัญชีเงินฝาก
               </p>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-2xs">
+            <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-2xs hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between text-slate-500 mb-2">
                 <span className="text-xs font-medium">ยอดเงินฝากรวมทั้งระบบ</span>
                 <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -592,7 +550,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </p>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-2xs">
+            <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-2xs hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between text-slate-500 mb-2">
                 <span className="text-xs font-medium">ยอดเงินถอนรวมทั้งระบบ</span>
                 <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
@@ -789,7 +747,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* SUBTAB 2: Approvals and Audit Center */}
       {activeSubTab === 'approvals' && (
         <div className="space-y-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-2xs space-y-4">
+          <div className="bg-white border border-slate-200 rounded-[2rem] p-4 sm:p-5 shadow-2xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
@@ -802,62 +760,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
 
               {/* Status Filters */}
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setStatusFilter('all')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
-                    statusFilter === 'all'
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  ทั้งหมด ({transactions.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStatusFilter('pending')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
-                    statusFilter === 'pending'
-                      ? 'bg-amber-600 text-white'
-                      : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
-                  }`}
-                >
-                  รอตรวจสอบ ({transactions.filter((t) => t.status === 'pending').length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStatusFilter('completed')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
-                    statusFilter === 'completed'
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                  }`}
-                >
-                  อนุมัติแล้ว ({transactions.filter((t) => t.status === 'completed').length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStatusFilter('rejected')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
-                    statusFilter === 'rejected'
-                      ? 'bg-rose-600 text-white'
-                      : 'bg-rose-50 text-rose-700 hover:bg-rose-100'
-                  }`}
-                >
-                  ปฏิเสธ ({transactions.filter((t) => t.status === 'rejected').length})
-                </button>
-
-                <div className="h-5 w-[1px] bg-slate-200 mx-1 hidden sm:block"></div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex p-1 bg-slate-100 rounded-2xl gap-1 overflow-x-auto">
+                  {([
+                    { id: 'all', label: 'ทั้งหมด', n: transactions.length, on: 'bg-slate-900 text-white' },
+                    { id: 'pending', label: 'รอตรวจสอบ', n: transactions.filter((t) => t.status === 'pending').length, on: 'bg-amber-500 text-white' },
+                    { id: 'completed', label: 'อนุมัติแล้ว', n: transactions.filter((t) => t.status === 'completed').length, on: 'bg-emerald-600 text-white' },
+                    { id: 'rejected', label: 'ปฏิเสธ', n: transactions.filter((t) => t.status === 'rejected').length, on: 'bg-rose-600 text-white' },
+                  ] as const).map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => setStatusFilter(f.id)}
+                      className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                        statusFilter === f.id ? `${f.on} shadow-sm` : 'text-slate-600 hover:bg-white/70'
+                      }`}
+                    >
+                      {f.label} <span className="opacity-70 font-mono">({f.n})</span>
+                    </button>
+                  ))}
+                </div>
 
                 <button
                   type="button"
                   onClick={() => setShowExportModal(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer"
                   title="ส่งออกรายงานธุรกรรมเป็น Excel / CSV"
                 >
                   <FileSpreadsheet className="w-3.5 h-3.5" />
-                  <span>ส่งออกรายงาน (Excel/CSV)</span>
+                  <span>ส่งออกรายงาน</span>
                 </button>
               </div>
             </div>
@@ -870,12 +801,68 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 placeholder="ค้นหาด้วยรหัสธุรกรรม, เลขบัญชี, หรือชื่อสมาชิก..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+                className="w-full pl-9 pr-3 py-3 text-sm bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
               />
             </div>
 
+            {/* Mobile cards */}
+            <div className="md:hidden space-y-2.5">
+              {filteredTransactions.length > 0 ? (
+                filteredTransactions.map((t) => {
+                  const isDeposit = t.type === 'deposit';
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setInspectingTxn(t)}
+                      className="w-full text-left rounded-2xl border border-slate-200 p-3.5 bg-white active:bg-slate-50 space-y-2 cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span
+                          className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                            isDeposit ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                          }`}
+                        >
+                          {isDeposit ? 'ฝากเงิน' : 'ถอนเงิน'}
+                        </span>
+                        <span
+                          className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                            t.status === 'completed'
+                              ? 'bg-emerald-50 text-emerald-700'
+                              : t.status === 'pending'
+                              ? 'bg-amber-50 text-amber-700'
+                              : 'bg-rose-50 text-rose-700'
+                          }`}
+                        >
+                          {t.status === 'completed' ? 'อนุมัติแล้ว' : t.status === 'pending' ? 'รอตรวจสอบ' : 'ปฏิเสธ'}
+                        </span>
+                      </div>
+                      <div className="flex items-end justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="text-sm font-bold text-slate-900 truncate">{t.accountName}</div>
+                          <div className="text-[11px] text-slate-500 font-mono">
+                            {formatAccountNo(t.accountNo)} • {t.refCode}
+                          </div>
+                          <div className="text-[11px] text-slate-400">{formatThaiDateTime(t.dateTime)}</div>
+                        </div>
+                        <div
+                          className={`text-base font-bold font-mono shrink-0 ${
+                            isDeposit ? 'text-emerald-600' : 'text-rose-600'
+                          }`}
+                        >
+                          ฿{formatCurrency(t.amount)}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="py-8 text-center text-slate-400 text-xs">ไม่พบรายการธุรกรรมตามเงื่อนไขที่กำหนด</div>
+              )}
+            </div>
+
             {/* Transactions Table */}
-            <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <div className="hidden md:block overflow-x-auto rounded-2xl border border-slate-200">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
@@ -999,7 +986,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* SUBTAB 3: Accounts Management */}
       {activeSubTab === 'accounts' && (
         <div className="space-y-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-2xs space-y-4">
+          <div className="bg-white border border-slate-200 rounded-[2rem] p-4 sm:p-5 shadow-2xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="text-sm font-bold text-slate-900">
@@ -1039,7 +1026,41 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-slate-200">
+            {/* Mobile cards */}
+            <div className="md:hidden space-y-2.5">
+              {accounts.map((acc) => (
+                <div key={acc.id} className="rounded-2xl border border-slate-200 p-3.5 bg-white space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-sm font-bold text-slate-900">{formatAccountNo(acc.accountNo)}</span>
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                        acc.accountType === 'ออมทรัพย์พิเศษ' ? 'bg-slate-800 text-white' : 'bg-emerald-100 text-emerald-800'
+                      }`}
+                    >
+                      {acc.accountType}
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-600">
+                    {acc.accountName} • รหัส <span className="font-mono">{acc.memberId}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-xl bg-emerald-50/70 px-3 py-2">
+                      <div className="text-[10px] text-emerald-700">ยอดคงเหลือ</div>
+                      <div className="font-mono font-bold text-emerald-700 text-sm">฿{formatCurrency(acc.balance)}</div>
+                    </div>
+                    <div className="rounded-xl bg-amber-50/70 px-3 py-2">
+                      <div className="text-[10px] text-amber-700">ดอกเบี้ยสะสม</div>
+                      <div className="font-mono font-bold text-amber-700 text-sm">฿{formatCurrency(acc.accruedInterest)}</div>
+                    </div>
+                  </div>
+                  <div className="text-[11px] text-slate-400">
+                    {formatCitizenId(acc.citizenId, true)} • {acc.contact || '-'}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden md:block overflow-x-auto rounded-2xl border border-slate-200">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 whitespace-nowrap">
@@ -1114,7 +1135,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* SUBTAB 4: Members Management */}
       {activeSubTab === 'members' && (
         <div className="space-y-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-2xs space-y-4">
+          <div className="bg-white border border-slate-200 rounded-[2rem] p-4 sm:p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-slate-900">
@@ -1157,11 +1178,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
 
                   <div className="flex items-center gap-2.5 pt-1">
-                    <img
-                      src={m.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80'}
-                      alt={m.fullName}
-                      className="w-10 h-10 rounded-full object-cover border border-slate-200"
-                    />
+                    {m.avatarUrl ? (
+                      <img
+                        src={m.avatarUrl}
+                        alt={m.fullName}
+                        className="w-10 h-10 rounded-full object-cover border border-slate-200"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold">
+                        {m.fullName.charAt(0)}
+                      </div>
+                    )}
                     <div>
                       <h4 className="text-xs font-bold text-slate-900">{m.fullName}</h4>
                       <p className="text-[11px] font-mono text-slate-500">
@@ -1221,11 +1248,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Transaction Inspection & Approval Modal */}
       {inspectingTxn && (
         <div
-          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+          className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4 overflow-y-auto"
           onClick={() => setInspectingTxn(null)}
         >
           <div
-            className="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl my-6 animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white rounded-t-3xl sm:rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl sm:my-6 animate-in slide-in-from-bottom-6 sm:zoom-in-95 fade-in duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -1452,11 +1479,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Add New Member Modal */}
       {showAddMemberModal && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+          className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4"
           onClick={() => setShowAddMemberModal(false)}
         >
           <div
-            className="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full overflow-hidden shadow-2xl p-6 animate-in slide-in-from-bottom-6 sm:zoom-in-95 fade-in duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -1547,11 +1574,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Add New Account Modal */}
       {showAddAccountModal && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+          className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4"
           onClick={() => setShowAddAccountModal(false)}
         >
           <div
-            className="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl p-6 animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full overflow-hidden shadow-2xl p-6 animate-in slide-in-from-bottom-6 sm:zoom-in-95 fade-in duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -1626,7 +1653,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Batch Member Upload Form Modal */}
       {showUploadMembersModal && (
         <div
-          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+          className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4 overflow-y-auto"
           onClick={() => setShowUploadMembersModal(false)}
         >
           <div

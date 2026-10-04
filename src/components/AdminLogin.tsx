@@ -57,8 +57,8 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({
 
       {/* Header Banner */}
       <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-slate-900 via-indigo-950 to-blue-900 text-white shadow-lg shadow-indigo-950/30 mb-3 border border-indigo-800/40">
-          <ShieldAlert className="w-7 h-7 text-indigo-300" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-blue-900 text-white shadow-xl shadow-indigo-900/25 mb-3">
+          <ShieldAlert className="w-7 h-7 text-white" />
         </div>
         <div className="inline-block bg-indigo-100 text-indigo-900 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1.5 border border-indigo-200">
           Cooperative Officer & Management Portal
@@ -72,7 +72,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({
       </div>
 
       {/* Login Card */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-[2rem] p-6 shadow-xl shadow-slate-900/5">
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Username */}
           <div>
@@ -88,7 +88,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({
                   setUsername(e.target.value);
                   setError(null);
                 }}
-                className="w-full pl-9 pr-3.5 py-2.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-900"
+                className="w-full pl-10 pr-3.5 py-3 text-sm font-mono bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-900"
                 required
               />
               <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -111,7 +111,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({
                   setPassword(e.target.value);
                   setError(null);
                 }}
-                className="w-full pl-9 pr-10 py-2.5 text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-900"
+                className="w-full pl-10 pr-10 py-3 text-sm font-mono bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-900"
                 required
               />
               <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -138,7 +138,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 active:scale-[0.99] text-white font-semibold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {isSubmitting ? (
               <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>

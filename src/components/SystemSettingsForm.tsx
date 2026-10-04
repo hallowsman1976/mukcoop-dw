@@ -82,9 +82,9 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden space-y-0">
+    <div className="bg-white border border-slate-200 rounded-[2rem] shadow-sm overflow-hidden space-y-0">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-5 sm:p-6">
+      <div className="bg-gradient-to-br from-indigo-700 via-indigo-800 to-slate-900 text-white p-5 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-xs flex items-center justify-center text-indigo-300 border border-white/20">
@@ -99,7 +99,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   Global Config
                 </span>
               </div>
-              <p className="text-xs text-indigo-200 mt-0.5">
+              <p className="text-xs text-indigo-100/80 mt-0.5">
                 กำหนดนโยบายการเงิน อัตราดอกเบี้ย วงเงินทำรายการ เวลาทำการ และการเชื่อมต่อ LINE LIFF
               </p>
             </div>
@@ -118,14 +118,14 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
         </div>
 
         {/* Section Navigation Tabs */}
-        <div className="mt-6 pt-4 border-t border-slate-800 flex items-center gap-2 overflow-x-auto scrollbar-none">
+        <div className="mt-6 pt-4 border-t border-white/15 flex items-center gap-2 overflow-x-auto scrollbar-none">
           <button
             type="button"
             onClick={() => setActiveSection('organization')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
               activeSection === 'organization'
                 ? 'bg-white text-slate-900 shadow-xs font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                : 'text-indigo-100/80 hover:text-white hover:bg-white/10'
             }`}
           >
             <Building2 className="w-3.5 h-3.5" />
@@ -138,7 +138,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
               activeSection === 'financial'
                 ? 'bg-white text-slate-900 shadow-xs font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                : 'text-indigo-100/80 hover:text-white hover:bg-white/10'
             }`}
           >
             <Percent className="w-3.5 h-3.5" />
@@ -151,7 +151,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
               activeSection === 'operating'
                 ? 'bg-white text-slate-900 shadow-xs font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                : 'text-indigo-100/80 hover:text-white hover:bg-white/10'
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
@@ -164,7 +164,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
               activeSection === 'line'
                 ? 'bg-white text-slate-900 shadow-xs font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                : 'text-indigo-100/80 hover:text-white hover:bg-white/10'
             }`}
           >
             <Smartphone className="w-3.5 h-3.5" />
@@ -177,7 +177,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
             className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
               activeSection === 'security'
                 ? 'bg-white text-slate-900 shadow-xs font-bold'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                : 'text-indigo-100/80 hover:text-white hover:bg-white/10'
             }`}
           >
             <ShieldCheck className="w-3.5 h-3.5" />
@@ -233,7 +233,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   type="text"
                   value={settings.cooperativeName}
                   onChange={(e) => updateField('cooperativeName', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -246,7 +246,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   type="text"
                   value={settings.registrationNumber}
                   onChange={(e) => updateField('registrationNumber', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -259,7 +259,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   type="text"
                   value={settings.contactPhone}
                   onChange={(e) => updateField('contactPhone', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -272,7 +272,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   type="email"
                   value={settings.contactEmail}
                   onChange={(e) => updateField('contactEmail', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -285,7 +285,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   rows={2}
                   value={settings.officeAddress}
                   onChange={(e) => updateField('officeAddress', e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
               </div>
 
@@ -303,7 +303,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                     type="url"
                     value={settings.logoUrl}
                     onChange={(e) => updateField('logoUrl', e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono text-[11px]"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono text-[11px]"
                   />
                 </div>
               </div>
@@ -386,7 +386,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   step="10"
                   value={settings.minDepositAmount}
                   onChange={(e) => updateField('minDepositAmount', parseFloat(e.target.value) || 0)}
-                  className="w-full px-3 py-2 font-mono bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 font-mono bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -402,7 +402,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   step="10"
                   value={settings.minWithdrawAmount}
                   onChange={(e) => updateField('minWithdrawAmount', parseFloat(e.target.value) || 0)}
-                  className="w-full px-3 py-2 font-mono bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 font-mono bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -418,7 +418,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   step="1000"
                   value={settings.maxDailyWithdrawAmount}
                   onChange={(e) => updateField('maxDailyWithdrawAmount', parseFloat(e.target.value) || 0)}
-                  className="w-full px-3 py-2 font-mono font-bold bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 font-mono font-bold bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -434,7 +434,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   step="100"
                   value={settings.minAccountBalance}
                   onChange={(e) => updateField('minAccountBalance', parseFloat(e.target.value) || 0)}
-                  className="w-full px-3 py-2 font-mono bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 font-mono bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -604,7 +604,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   value={settings.liffId}
                   onChange={(e) => updateField('liffId', e.target.value)}
                   placeholder="2006789012-abcdeXYZ"
-                  className="w-full px-3 py-2 font-mono bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#06C755] focus:outline-none"
+                  className="w-full px-3 py-2 font-mono bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#06C755] focus:outline-none"
                   required
                 />
               </div>
@@ -618,7 +618,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                   value={settings.lineOfficialId}
                   onChange={(e) => updateField('lineOfficialId', e.target.value)}
                   placeholder="@coop.development"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#06C755] focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-[#06C755] focus:outline-none"
                   required
                 />
               </div>
@@ -737,7 +737,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
         )}
 
         {/* Submit Actions Bar */}
-        <div className="pt-5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="sticky bottom-0 -mx-5 sm:-mx-6 -mb-5 sm:-mb-6 px-5 sm:px-6 py-3 bg-white/95 backdrop-blur-md border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="text-xs text-slate-400">
             * การตั้งค่าทั้งหมดจะถูกบันทึกและซิงค์ทันทีเมื่อคลิกบันทึก
           </div>
@@ -746,7 +746,7 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-semibold text-xs transition-all shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold text-sm transition-all shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {isSaving ? (
                 <>

@@ -138,7 +138,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       )}
 
       {/* Login Card */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-[2rem] p-6 shadow-xl shadow-slate-900/5">
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Member ID (5 digits auto-pad) */}
           <div>
@@ -160,7 +160,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 value={memberIdInput}
                 onChange={handleMemberIdChange}
                 onBlur={handleMemberIdBlur}
-                className="w-full px-3.5 py-2.5 text-sm font-mono bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-900 tracking-wider"
+                className="w-full px-4 py-3.5 text-base font-mono bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-900 tracking-wider"
                 required
               />
               {memberIdInput && (
@@ -195,7 +195,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               placeholder="เลขบัตรประชาชน 13 หลัก"
               value={citizenIdInput}
               onChange={handleCitizenIdChange}
-              className="w-full px-3.5 py-2.5 text-sm font-mono bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-900 tracking-wider"
+              className="w-full px-4 py-3.5 text-base font-mono bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all text-slate-900 tracking-wider"
               required
             />
             {citizenIdInput.length > 0 && (
@@ -217,7 +217,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-medium text-sm rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-sm rounded-2xl shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {isSubmitting ? (
               <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -233,7 +233,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             href={addFriendUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white text-sm font-semibold transition-colors"
+            className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-[#06C755] hover:bg-[#05b34c] text-white text-sm font-semibold transition-colors"
           >
             <UserPlus className="w-4 h-4" />
             <span>เพิ่มเพื่อน LINE {lineOfficialId?.trim()}</span>

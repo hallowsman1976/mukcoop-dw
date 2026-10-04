@@ -40,11 +40,11 @@ export const GasIntegrationModal: React.FC<GasIntegrationModalProps> = ({ onClos
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+      className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl my-6"
+        className="bg-white rounded-t-3xl sm:rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl sm:my-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
