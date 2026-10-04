@@ -1,14 +1,16 @@
 import React, { useMemo } from 'react';
-import { Member, TransactionRecord, LiffUserProfile } from '../types';
+import { Member, BankAccount, TransactionRecord, LiffUserProfile } from '../types';
 import { formatCurrency } from '../utils/thaiBahtText';
 import { formatAccountNo, formatThaiDateTime } from '../utils/validators';
-import { ArrowDownLeft, ArrowUpRight, Clock, ArrowRight } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Clock, ArrowRight, CreditCard } from 'lucide-react';
 
 interface DashboardProps {
   currentMember: Member;
   liffProfile: LiffUserProfile | null;
+  accounts: BankAccount[];
   transactions: TransactionRecord[];
-  onNavigateTab: (tab: 'history') => void;
+  onNavigateTab: (tab: 'history' | 'accounts') => void;
+  onQuickAction: (account: BankAccount, action: 'deposit' | 'withdraw') => void;
 }
 
 const RECENT_LIMIT = 10;
@@ -16,9 +18,17 @@ const RECENT_LIMIT = 10;
 export const Dashboard: React.FC<DashboardProps> = ({
   currentMember,
   liffProfile,
+  accounts,
   transactions,
   onNavigateTab,
+  onQuickAction,
 }) => {
+  const memberAccounts = useMemo(
+    () => accounts.filter((a) => a.memberId === currentMember.memberId),
+    [accounts, currentMember.memberId]
+  );
+  const totalBalance = memberAccounts.reduce((sum, a) => sum + a.balance, 0);
+
   const memberTransactions = useMemo(
     () =>
       transactions
@@ -55,6 +65,79 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </p>
         </div>
       </div>
+
+      {/* Account cards */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900">บัญชีเงินฝากของคุณ</h3>
+            <p className="text-[11px] text-slate-500">
+              {memberAccounts.length} บัญชี • รวม <span className="font-mono font-semibold text-emerald-700">฿{formatCurrency(totalBalance)}</span>
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigateTab('accounts')}
+            className="text-xs text-emerald-700 font-semibold inline-flex items-center gap-1 cursor-pointer"
+          >
+            ดูทั้งหมด <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {memberAccounts.length > 0 ? (
+          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 pb-2 scrollbar-none">
+            {memberAccounts.map((acc) => {
+              const special = acc.accountType === 'ออมทรัพย์พิเศษ';
+              return (
+                <div
+                  key={acc.accountNo}
+                  className={`snap-start shrink-0 w-[82%] sm:w-80 rounded-3xl p-4 text-white shadow-lg relative overflow-hidden ${
+                    special
+                      ? 'bg-gradient-to-br from-slate-800 via-slate-800 to-emerald-900 shadow-slate-900/20'
+                      : 'bg-gradient-to-br from-teal-500 to-emerald-700 shadow-emerald-900/20'
+                  }`}
+                >
+                  <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10"></div>
+                  <div className="relative flex items-center justify-between">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/20">
+                      {acc.accountType}
+                    </span>
+                    <CreditCard className="w-4 h-4 opacity-70" />
+                  </div>
+                  <div className="relative mt-4 font-mono text-sm tracking-widest opacity-90">
+                    {formatAccountNo(acc.accountNo)}
+                  </div>
+                  <div className="relative mt-3 text-[10px] opacity-70">ยอดคงเหลือ</div>
+                  <div className="relative text-2xl font-bold font-mono">฿{formatCurrency(acc.balance)}</div>
+                  <div className="relative mt-3 flex items-center justify-between">
+                    <span className="text-[11px] text-amber-200">ดอกเบี้ย ฿{formatCurrency(acc.accruedInterest)}</span>
+                    <div className="flex gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => onQuickAction(acc, 'deposit')}
+                        className="px-3 py-1 rounded-full bg-white text-emerald-700 text-[11px] font-bold active:scale-95 transition-transform cursor-pointer"
+                      >
+                        ฝาก
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onQuickAction(acc, 'withdraw')}
+                        className="px-3 py-1 rounded-full bg-white/20 hover:bg-white/30 text-white text-[11px] font-bold active:scale-95 transition-all cursor-pointer"
+                      >
+                        ถอน
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="rounded-3xl border border-dashed border-slate-300 py-6 text-center text-xs text-slate-400">
+            ยังไม่มีบัญชีเงินฝาก
+          </div>
+        )}
+      </section>
 
       {/* Recent transactions */}
       <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-2xs space-y-3">

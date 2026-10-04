@@ -287,8 +287,10 @@ export default function App() {
                   <Dashboard
                     currentMember={currentMember}
                     liffProfile={liffStatus.profile}
+                    accounts={accounts}
                     transactions={transactions}
                     onNavigateTab={setActiveTab}
+                    onQuickAction={handleSelectAccountAction}
                   />
                 </div>
               )}
