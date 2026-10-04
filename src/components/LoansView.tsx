@@ -168,96 +168,77 @@ export const LoansView: React.FC<LoansViewProps> = ({
       : 0;
 
   return (
-    <div className="space-y-6">
-      <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-800">
-        <b>ข้อมูลทดลอง:</b> ส่วนสินเชื่อยังไม่เชื่อมกับฐานข้อมูลจริง การชำระค่างวดในหน้านี้ไม่ตัดยอดบัญชีเงินฝากและไม่ถูกบันทึกในระบบสหกรณ์
+    <div className="max-w-4xl mx-auto space-y-5">
+      <div className="px-3.5 py-2.5 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-800 flex items-start gap-2">
+        <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+        <span>
+          <b>ข้อมูลทดลอง:</b> ส่วนสินเชื่อยังไม่เชื่อมกับฐานข้อมูลจริง การชำระค่างวดในหน้านี้ไม่ตัดยอดบัญชีเงินฝากและไม่ถูกบันทึกในระบบสหกรณ์
+        </span>
       </div>
-      {/* Top Banner / Summary */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white rounded-3xl p-5 sm:p-7 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 backdrop-blur-xs flex items-center justify-center text-indigo-300 border border-indigo-400/30">
-              <Coins className="w-6 h-6 text-indigo-300" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold">สินเชื่อและการผ่อนชำระ (Cooperative Loans)</h2>
-                <span className="text-[10px] bg-indigo-500/30 text-indigo-200 font-semibold px-2 py-0.5 rounded-full border border-indigo-400/30">
-                  {loans.length} สัญญา
-                </span>
-              </div>
-              <p className="text-xs text-indigo-200 mt-0.5">
-                ติดตามยอดหนี้คงเหลือ แผนการผ่อนชำระรายงวด และชำระค่างวดออนไลน์หักบัญชีทันที
-              </p>
-            </div>
-          </div>
 
-          {/* Quick Sub-Navigation */}
-          <div className="flex items-center gap-1.5 bg-white/10 p-1 rounded-2xl border border-white/15">
-            <button
-              type="button"
-              onClick={() => setActiveTab('contracts')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                activeTab === 'contracts'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-white/80 hover:text-white'
-              }`}
-            >
-              สัญญาเงินกู้ของฉัน ({loans.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('calculator')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-                activeTab === 'calculator'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-white/80 hover:text-white'
-              }`}
-            >
-              <Calculator className="w-3.5 h-3.5" />
-              <span>คำนวณสินเชื่อ</span>
-            </button>
+      {/* Header / portfolio summary */}
+      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-indigo-600 via-indigo-700 to-blue-900 text-white p-5 sm:p-7 shadow-xl shadow-indigo-900/20">
+        <div className="absolute -top-16 -right-10 w-64 h-64 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+        <div className="absolute -bottom-24 -left-10 w-64 h-64 rounded-full bg-blue-300/20 blur-3xl pointer-events-none"></div>
+
+        <div className="relative flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/20 flex items-center justify-center shrink-0">
+            <Coins className="w-6 h-6" />
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold leading-tight">สินเชื่อและการผ่อนชำระ</h2>
+            <p className="text-xs text-indigo-100/90">
+              {loans.length > 0 ? `${loans.length} สัญญา • ติดตามยอดหนี้และชำระค่างวดออนไลน์` : 'ติดตามยอดหนี้ และจำลองการกู้เงิน'}
+            </p>
           </div>
         </div>
 
-        {/* Global Progress & Stats Cards */}
         {loans.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-indigo-900/60 text-xs">
-            <div className="bg-white/5 p-3 rounded-2xl border border-white/10">
-              <span className="text-indigo-300 text-[11px] block">วงเงินกู้รวมทั้งหมด</span>
-              <span className="text-base font-bold font-mono text-white mt-0.5 block">
-                ฿{formatCurrency(totalPrincipalAll)}
-              </span>
+          <div className="relative mt-5">
+            <p className="text-xs text-indigo-100/90">ยอดหนี้คงเหลือรวม</p>
+            <div className="mt-0.5 text-4xl font-bold font-mono tracking-tight">
+              <span className="text-2xl text-indigo-200 mr-1">฿</span>
+              {formatCurrency(totalRemainingAll)}
             </div>
 
-            <div className="bg-white/5 p-3 rounded-2xl border border-white/10">
-              <span className="text-indigo-300 text-[11px] block">ยอดหนี้คงเหลือรวม</span>
-              <span className="text-base font-bold font-mono text-amber-300 mt-0.5 block">
-                ฿{formatCurrency(totalRemainingAll)}
-              </span>
-            </div>
-
-            <div className="bg-white/5 p-3 rounded-2xl border border-white/10">
-              <span className="text-indigo-300 text-[11px] block">ชำระคืนเงินต้นแล้ว</span>
-              <span className="text-base font-bold font-mono text-emerald-400 mt-0.5 block">
-                ฿{formatCurrency(totalPaidPrincipalAll)}
-              </span>
-            </div>
-
-            <div className="bg-white/5 p-3 rounded-2xl border border-white/10">
-              <div className="flex items-center justify-between">
-                <span className="text-indigo-300 text-[11px]">ความคืบหน้าการชำระ</span>
-                <span className="font-mono font-bold text-emerald-400">{overallProgressPercent}%</span>
+            <div className="mt-4 space-y-1.5">
+              <div className="flex items-center justify-between text-[11px] text-indigo-100">
+                <span>ชำระเงินต้นแล้ว ฿{formatCurrency(totalPaidPrincipalAll)}</span>
+                <span className="font-mono font-bold text-white">{overallProgressPercent}%</span>
               </div>
-              <div className="w-full h-2 bg-white/10 rounded-full mt-2 overflow-hidden">
+              <div className="w-full h-2.5 bg-white/15 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-emerald-400 rounded-full transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-emerald-300 to-teal-300 rounded-full transition-all duration-500"
                   style={{ width: `${overallProgressPercent}%` }}
                 ></div>
               </div>
+              <div className="text-[11px] text-indigo-200">วงเงินกู้รวม ฿{formatCurrency(totalPrincipalAll)}</div>
             </div>
           </div>
         )}
+      </div>
+
+      {/* Sub navigation */}
+      <div className="flex p-1 bg-slate-100 rounded-2xl gap-1">
+        <button
+          type="button"
+          onClick={() => setActiveTab('contracts')}
+          className={`flex-1 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            activeTab === 'contracts' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-white/60'
+          }`}
+        >
+          สัญญาเงินกู้ของฉัน ({loans.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('calculator')}
+          className={`flex-1 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            activeTab === 'calculator' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-white/60'
+          }`}
+        >
+          <Calculator className="w-3.5 h-3.5" />
+          <span>คำนวณสินเชื่อ</span>
+        </button>
       </div>
 
       {/* CONTRACTS VIEW */}
@@ -306,7 +287,7 @@ export const LoansView: React.FC<LoansViewProps> = ({
 
               {/* Selected Loan Spotlight Card */}
               {selectedLoan && (
-                <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-6">
+                <div className="bg-white border border-slate-200 rounded-[2rem] p-4 sm:p-6 shadow-sm space-y-5">
                   {/* Contract Header */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
                     <div className="space-y-1">
@@ -334,7 +315,7 @@ export const LoansView: React.FC<LoansViewProps> = ({
                       <button
                         type="button"
                         onClick={() => handleOpenRepayModal(selectedLoan)}
-                        className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-semibold rounded-xl transition-all shadow-md shadow-emerald-700/20 flex items-center gap-1.5 cursor-pointer"
+                        className="w-full sm:w-auto justify-center px-5 py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-semibold rounded-2xl transition-all shadow-md shadow-emerald-700/20 flex items-center gap-1.5 cursor-pointer"
                       >
                         <CreditCard className="w-4 h-4" />
                         <span>ชำระค่างวดออนไลน์ (งวดที่ {selectedLoan.nextDueInstallmentNo})</span>
@@ -415,99 +396,82 @@ export const LoansView: React.FC<LoansViewProps> = ({
                     </div>
                   </div>
 
-                  {/* Installments Table */}
+                  {/* Installments */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
                         <FileText className="w-4 h-4 text-indigo-600" />
-                        <h4 className="font-bold text-slate-900">
-                          ตารางแผนการผ่อนชำระหนี้รายงวด (Amortization Schedule)
-                        </h4>
+                        <h4 className="font-bold text-slate-900">แผนการผ่อนชำระรายงวด</h4>
                       </div>
-                      <span className="text-slate-400">
-                        แสดง {selectedLoan.installments.length} งวดทั้งหมด
-                      </span>
+                      <span className="text-slate-400">{selectedLoan.installments.length} งวด</span>
                     </div>
 
-                    <div className="overflow-x-auto rounded-2xl border border-slate-200 max-h-96 overflow-y-auto">
-                      <table className="w-full text-left border-collapse text-xs">
-                        <thead className="bg-slate-50 sticky top-0 z-10 border-b border-slate-200 text-slate-600 font-semibold">
-                          <tr>
-                            <th className="py-2.5 px-3">งวดที่</th>
-                            <th className="py-2.5 px-3">กำหนดชำระ</th>
-                            <th className="py-2.5 px-3 text-right">เงินต้น</th>
-                            <th className="py-2.5 px-3 text-right">ดอกเบี้ย</th>
-                            <th className="py-2.5 px-3 text-right">รวมค่างวด</th>
-                            <th className="py-2.5 px-3 text-center">สถานะ</th>
-                            <th className="py-2.5 px-3">รหัสอ้างอิงธุรกรรม / ใบเสร็จ</th>
-                            <th className="py-2.5 px-3 text-center">ดำเนินการ</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                          {selectedLoan.installments.map((ins) => (
-                            <tr
-                              key={ins.installmentNo}
-                              className={`hover:bg-slate-50 transition-colors ${
-                                ins.status === 'paid'
-                                  ? 'bg-white'
-                                  : ins.installmentNo === selectedLoan.nextDueInstallmentNo
-                                  ? 'bg-amber-50/40'
-                                  : ''
+                    <div className="rounded-2xl border border-slate-200 divide-y divide-slate-100 max-h-[28rem] overflow-y-auto">
+                      {selectedLoan.installments.map((ins) => {
+                        const paid = ins.status === 'paid';
+                        const isNext = !paid && ins.installmentNo === selectedLoan.nextDueInstallmentNo;
+                        return (
+                          <div
+                            key={ins.installmentNo}
+                            className={`flex items-center gap-3 px-3.5 py-3 ${isNext ? 'bg-amber-50/60' : 'bg-white'}`}
+                          >
+                            <div
+                              className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold font-mono ${
+                                paid
+                                  ? 'bg-emerald-100 text-emerald-700'
+                                  : isNext
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-slate-100 text-slate-500'
                               }`}
                             >
-                              <td className="py-2.5 px-3 font-mono font-bold text-slate-800">
-                                {ins.installmentNo}
-                              </td>
-                              <td className="py-2.5 px-3 font-mono text-slate-600">
-                                {ins.dueDate}
-                              </td>
-                              <td className="py-2.5 px-3 text-right font-mono text-slate-700">
-                                ฿{formatCurrency(ins.principal)}
-                              </td>
-                              <td className="py-2.5 px-3 text-right font-mono text-slate-500">
-                                ฿{formatCurrency(ins.interest)}
-                              </td>
-                              <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
+                              {paid ? <CheckCircle2 className="w-4 h-4" /> : ins.installmentNo}
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-xs font-bold text-slate-800">งวดที่ {ins.installmentNo}</span>
+                                {paid ? (
+                                  <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
+                                    ชำระแล้ว
+                                  </span>
+                                ) : isNext ? (
+                                  <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-amber-700 bg-amber-100 border border-amber-200 px-1.5 py-0.5 rounded-full">
+                                    <Clock className="w-2.5 h-2.5" /> งวดถัดไป
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-full">
+                                    รอชำระ
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-400 font-mono">
+                                ครบกำหนด {ins.dueDate} • ต้น ฿{formatCurrency(ins.principal)} • ดอก ฿
+                                {formatCurrency(ins.interest)}
+                              </p>
+                              {ins.txnRef && (
+                                <p className="text-[10px] font-mono text-indigo-600">
+                                  {ins.txnRef} {ins.receiptNo && `• ${ins.receiptNo}`}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="text-right shrink-0 space-y-1">
+                              <div className="text-sm font-bold font-mono text-slate-900">
                                 ฿{formatCurrency(ins.totalAmount)}
-                              </td>
-                              <td className="py-2.5 px-3 text-center">
-                                {ins.status === 'paid' ? (
-                                  <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium border border-emerald-200">
-                                    <CheckCircle2 className="w-3 h-3 text-emerald-600" /> ชำระแล้ว
-                                  </span>
-                                ) : (
-                                  <span className="inline-flex items-center gap-1 text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full font-medium border border-amber-200">
-                                    <Clock className="w-3 h-3 text-amber-600" /> รอชำระ
-                                  </span>
-                                )}
-                              </td>
-                              <td className="py-2.5 px-3 text-xs">
-                                {ins.txnRef ? (
-                                  <div className="font-mono text-[11px]">
-                                    <span className="text-indigo-600 block">{ins.txnRef}</span>
-                                    <span className="text-slate-400 text-[10px]">{ins.receiptNo}</span>
-                                  </div>
-                                ) : (
-                                  <span className="text-slate-300">-</span>
-                                )}
-                              </td>
-                              <td className="py-2.5 px-3 text-center">
-                                {ins.status !== 'paid' ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleOpenRepayModal(selectedLoan, ins.installmentNo)}
-                                    className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-semibold transition-colors cursor-pointer"
-                                  >
-                                    ชำระงวดนี้
-                                  </button>
-                                ) : (
-                                  <span className="text-[11px] text-slate-400">เรียบร้อย</span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                              </div>
+                              {!paid && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenRepayModal(selectedLoan, ins.installmentNo)}
+                                  className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-full text-[11px] font-semibold transition-all cursor-pointer"
+                                >
+                                  ชำระ
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -519,7 +483,7 @@ export const LoansView: React.FC<LoansViewProps> = ({
 
       {/* LOAN CALCULATOR TAB */}
       {activeTab === 'calculator' && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 shadow-sm space-y-6">
+        <div className="bg-white border border-slate-200 rounded-[2rem] p-4 sm:p-7 shadow-sm space-y-6">
           <div className="border-b border-slate-100 pb-4">
             <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
               <Calculator className="w-5 h-5 text-indigo-600" />
@@ -662,13 +626,13 @@ export const LoansView: React.FC<LoansViewProps> = ({
       {/* REPAYMENT MODAL */}
       {repayingLoan && (
         <div
-          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+          className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4 overflow-y-auto"
           onClick={() => {
             if (!isProcessingPayment) setRepayingLoan(null);
           }}
         >
           <div
-            className="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl my-6 animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white rounded-t-3xl sm:rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl sm:my-6 animate-in slide-in-from-bottom-6 sm:zoom-in-95 fade-in duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             {paymentReceipt ? (
