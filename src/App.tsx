@@ -171,7 +171,7 @@ export default function App() {
       id: `test-${Date.now()}`,
       refCode: `TEST-${Date.now().toString().slice(-6)}`,
       type: 'deposit',
-      accountNo: accounts[0]?.accountNo || '101-2-00128-1',
+      accountNo: accounts[0]?.accountNo || '11-00128-0',
       accountName: currentMember?.fullName || 'ทดสอบสมาชิก',
       accountType: 'ออมทรัพย์',
       memberId: currentMember?.memberId || '00128',

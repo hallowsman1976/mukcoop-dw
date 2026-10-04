@@ -127,7 +127,7 @@ export const DepositForm: React.FC<DepositFormProps> = ({
         dateTime: `${depositDate} ${depositTime}:12`,
         senderName: currentMember.fullName,
         receiverName: 'สหกรณ์ออมทรัพย์ (บัญชีหลัก)',
-        receiverAccount: '101-2-XXXXX-1',
+        receiverAccount: '11-XXXXX-0',
         confidenceScore: 0.99,
         message: 'ตรวจสอบผ่าน API สำเร็จ: สลิปถูกต้อง ไม่พบประวัติใช้งานซ้ำ ยอดเงินตรงกัน',
       });

@@ -44,12 +44,28 @@ export function formatCitizenId(id: string, mask: boolean = false): string {
 }
 
 /**
- * Format Bank / Cooperative Account Number (e.g. 101-2-00428-1)
+ * Cooperative account number: NN-NNNNN-N (e.g. 15-00003-0).
+ * The first two digits are the product code, the middle five are the account
+ * running number, and the last digit closes the number.
+ */
+export const ACCOUNT_PREFIX_REGULAR = '11'; // ออมทรัพย์
+export const ACCOUNT_PREFIX_SPECIAL = '15'; // ออมทรัพย์พิเศษ
+
+export function accountPrefixFor(type: string): string {
+  return type === 'ออมทรัพย์พิเศษ' ? ACCOUNT_PREFIX_SPECIAL : ACCOUNT_PREFIX_REGULAR;
+}
+
+export function accountTypeFromNo(no: string): 'ออมทรัพย์' | 'ออมทรัพย์พิเศษ' {
+  return no.replace(/\D/g, '').startsWith(ACCOUNT_PREFIX_SPECIAL) ? 'ออมทรัพย์พิเศษ' : 'ออมทรัพย์';
+}
+
+/**
+ * Format Bank / Cooperative Account Number (e.g. 15-00003-0)
  */
 export function formatAccountNo(no: string): string {
   const cleaned = no.replace(/\D/g, '');
-  if (cleaned.length === 10) {
-    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 4)}-${cleaned.slice(4, 9)}-${cleaned.slice(9, 10)}`;
+  if (cleaned.length === 8) {
+    return `${cleaned.slice(0, 2)}-${cleaned.slice(2, 7)}-${cleaned.slice(7, 8)}`;
   }
   return no;
 }
@@ -130,39 +146,21 @@ export function isValidMemberId(raw: string): { valid: boolean; padded: string; 
 }
 
 /**
- * Strict validator for Bank Account Number (e.g. 101-2-00128-1 or 10 digits):
- * Checks length, structure, and optional consistency with Member ID.
+ * Strict validator for Bank Account Number (e.g. 15-00003-0 or 8 digits).
  */
 export function isValidAccountNo(
-  rawAccNo: string,
-  expectedMemberId?: string
+  rawAccNo: string
 ): { valid: boolean; formatted: string; error?: string } {
   if (!rawAccNo || !rawAccNo.trim()) {
     return { valid: false, formatted: '', error: 'หมายเลขบัญชีว่างเปล่า' };
   }
   const digitsOnly = rawAccNo.replace(/\D/g, '');
-  if (digitsOnly.length !== 10) {
+  if (digitsOnly.length !== 8) {
     return {
       valid: false,
       formatted: rawAccNo,
-      error: `หมายเลขบัญชีต้องมี 10 หลัก (พบ ${digitsOnly.length} หลัก)`,
+      error: `หมายเลขบัญชีต้องมี 8 หลักในรูปแบบ 00-00000-0 (พบ ${digitsOnly.length} หลัก)`,
     };
   }
-
-  const formatted = formatAccountNo(digitsOnly);
-
-  // If expected member ID is specified, verify that the embedded 5 digits match
-  if (expectedMemberId) {
-    const embeddedMemberId = digitsOnly.slice(4, 9);
-    const paddedExpected = padMemberId(expectedMemberId);
-    if (embeddedMemberId !== paddedExpected) {
-      return {
-        valid: false,
-        formatted,
-        error: `หมายเลขบัญชีไม่ตรงกับรหัสสมาชิก (พบรหัส ${embeddedMemberId} แต่คาดหวัง ${paddedExpected})`,
-      };
-    }
-  }
-
-  return { valid: true, formatted };
+  return { valid: true, formatted: formatAccountNo(digitsOnly) };
 }

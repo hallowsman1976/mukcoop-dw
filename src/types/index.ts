@@ -29,7 +29,7 @@ export interface Member {
 export interface BankAccount {
   id: string;
   no: number;
-  accountNo: string; // e.g. "101-2-00428-1"
+  accountNo: string; // e.g. "15-00003-0"
   memberId: string;
   citizenId: string;
   accountName: string;

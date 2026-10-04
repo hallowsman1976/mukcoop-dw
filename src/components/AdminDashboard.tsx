@@ -10,6 +10,7 @@ import {
 import { formatCurrency, thaiBahtText } from '../utils/thaiBahtText';
 import {
   formatAccountNo,
+  accountPrefixFor,
   formatCitizenId,
   formatThaiDateTime,
   formatThaiDate,
@@ -276,7 +277,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             citizenId: cleanedCitizen,
             fullName: newFullName.trim() || 'สมาชิกใหม่',
             accountName: newFullName.trim() || 'สมาชิกใหม่',
-            accountNo: `101-2-${padded}-1`,
+            accountNo: nextAccountNo('ออมทรัพย์'),
             accountType: 'ออมทรัพย์',
             balance: 0,
             contact: newPhone,
@@ -301,15 +302,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setNewPhone('');
   };
 
+  // Next free account number for a product: NN-NNNNN-0 with the running number after the highest in use.
+  const nextAccountNo = (type: string): string => {
+    const prefix = accountPrefixFor(type);
+    const used = accounts
+      .map((a) => a.accountNo.replace(/\D/g, ''))
+      .filter((d) => d.length === 8 && d.startsWith(prefix))
+      .map((d) => parseInt(d.slice(2, 7), 10));
+    const next = (used.length ? Math.max(...used) : 0) + 1;
+    return `${prefix}-${String(next).padStart(5, '0')}-0`;
+  };
+
   // Handle Create Account (superadmin only on the server: an opening balance is set like a CSV import)
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     const targetMember = members.find((m) => m.memberId === selectedMemberForAccount);
     if (!targetMember) return;
 
-    const prefix = newAccountType === 'ออมทรัพย์พิเศษ' ? '201-5' : '101-2';
-    const owned = accounts.filter((a) => a.memberId === targetMember.memberId).length;
-    const accNo = `${prefix}-${targetMember.memberId}-${owned + 1}`;
+    const accNo = nextAccountNo(newAccountType);
 
     try {
       const r = await StorageService.importMembers(

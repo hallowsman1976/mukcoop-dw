@@ -8,6 +8,8 @@ import {
   validateFileSize,
   isValidMemberId,
   isValidAccountNo,
+  accountPrefixFor,
+  accountTypeFromNo,
   isValidCitizenId,
 } from '../utils/validators';
 import {
@@ -214,19 +216,19 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
       }
 
       const accType: AccountType =
-        rawAccType.includes('พิเศษ') || rawAccNo.startsWith('201')
+        rawAccType.includes('พิเศษ') || accountTypeFromNo(rawAccNo) === 'ออมทรัพย์พิเศษ'
           ? 'ออมทรัพย์พิเศษ'
           : 'ออมทรัพย์';
 
       // 3. Rigorous Account ID Validation
-      const prefix = accType === 'ออมทรัพย์พิเศษ' ? '201-5' : '101-2';
-      const fallbackAccNo = `${prefix}-${paddedMId || '00000'}-1`;
+      const prefix = accountPrefixFor(accType);
+      const fallbackAccNo = `${prefix}-${paddedMId || '00000'}-0`;
 
       let isAccountIdValid = true;
       let formattedAccNo = fallbackAccNo;
 
       if (rawAccNo) {
-        const accValidation = isValidAccountNo(rawAccNo, paddedMId);
+        const accValidation = isValidAccountNo(rawAccNo);
         isAccountIdValid = accValidation.valid;
         formattedAccNo = accValidation.formatted;
         if (!accValidation.valid && accValidation.error) {
@@ -345,13 +347,13 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
 
     const rows = validRows.map((r) => {
       const accType = r.accountType || defaultAccountType;
-      const prefix = accType === 'ออมทรัพย์พิเศษ' ? '201-5' : '101-2';
+      const prefix = accountPrefixFor(accType);
       return {
         memberId: r.memberId,
         citizenId: r.citizenId,
         fullName: r.fullName,
         accountName: r.fullName,
-        accountNo: r.accountNo || `${prefix}-${r.memberId}-1`,
+        accountNo: r.accountNo || `${prefix}-${r.memberId}-0`,
         accountType: accType,
         balance: r.initialDeposit ?? 0,
         accruedInterest: r.accruedInterest ?? 0,
