@@ -303,6 +303,7 @@ export default function App() {
                 liffStatus={liffStatus}
                 logoUrl={brand.logoUrl}
                 coopName={brand.coopName}
+                lineOfficialId={brand.lineOfficialId}
                 onOpenLiffConfig={() => setShowLiffModal(true)}
               />
 
