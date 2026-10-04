@@ -174,153 +174,214 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 text-white rounded-3xl p-5 sm:p-6 shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
+      {/* Hero: total balance */}
+      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white p-5 sm:p-7 shadow-xl shadow-emerald-900/20">
+        <div className="absolute -top-16 -right-10 w-64 h-64 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+        <div className="absolute -bottom-24 -left-10 w-64 h-64 rounded-full bg-teal-300/20 blur-3xl pointer-events-none"></div>
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                <Sparkles className="w-3 h-3" /> แดชบอร์ดสรุปสถานะการเงินส่วนบุคคล
-              </span>
-              <button
-                type="button"
-                onClick={() => onNavigateTab('notifications')}
-                className={`text-[11px] font-medium px-2 py-0.5 rounded-full border transition-all flex items-center gap-1 cursor-pointer ${
-                  currentMember.notificationSettings?.enableLinePush !== false
-                    ? 'bg-[#06C755]/20 text-[#38ef7d] border-[#06C755]/40 hover:bg-[#06C755]/30'
-                    : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
-                }`}
-                title="คลิกเพื่อจัดการการแจ้งเตือน LINE"
-              >
-                {currentMember.notificationSettings?.enableLinePush !== false ? (
-                  <>
-                    <Bell className="w-3 h-3" />
-                    <span>แจ้งเตือน LINE: เปิด</span>
-                  </>
-                ) : (
-                  <>
-                    <BellOff className="w-3 h-3" />
-                    <span>แจ้งเตือน LINE: ปิด</span>
-                  </>
-                )}
-              </button>
-              <span className="text-[11px] text-slate-400 font-mono">
-                รหัสสมาชิก: <strong className="text-white">{currentMember.memberId}</strong>
-              </span>
+        <div className="relative z-10 flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            {currentMember.avatarUrl ? (
+              <img src={currentMember.avatarUrl} alt="" className="w-11 h-11 rounded-full object-cover ring-2 ring-white/40" />
+            ) : (
+              <div className="w-11 h-11 rounded-full bg-white/20 ring-2 ring-white/30 flex items-center justify-center font-bold">
+                {currentMember.fullName.charAt(0)}
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="text-[11px] text-emerald-100/90">สวัสดี</p>
+              <h2 className="text-base sm:text-lg font-bold leading-tight truncate">{currentMember.fullName}</h2>
+              <p className="text-[11px] text-emerald-100/80 font-mono">รหัสสมาชิก {currentMember.memberId}</p>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-              สวัสดีคุณ {currentMember.fullName}
-            </h2>
-            <p className="text-xs text-slate-300 max-w-xl">
-              ภาพรวมสินทรัพย์เงินฝาก สถิติกระแสเงินสดฝาก-ถอน และแนวโน้มดอกเบี้ยสะสมสหกรณ์แบบเรียลไทม์
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigateTab('notifications')}
+            className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/15 hover:bg-white/25 border border-white/20 backdrop-blur-sm transition-colors cursor-pointer"
+            title="จัดการการแจ้งเตือน LINE"
+          >
+            {currentMember.notificationSettings?.enableLinePush !== false ? (
+              <><Bell className="w-3 h-3" /><span>LINE เปิด</span></>
+            ) : (
+              <><BellOff className="w-3 h-3" /><span>LINE ปิด</span></>
+            )}
+          </button>
+        </div>
+
+        <div className="relative z-10 mt-6">
+          <p className="text-xs text-emerald-100/90 flex items-center gap-1.5">
+            <Wallet className="w-3.5 h-3.5" /> ยอดเงินฝากรวมทุกบัญชี ({memberAccounts.length} บัญชี)
+          </p>
+          <div className="mt-1 text-4xl sm:text-5xl font-bold font-mono tracking-tight">
+            <span className="text-2xl sm:text-3xl text-emerald-200 mr-1">฿</span>{formatCurrency(totalBalance)}
+          </div>
+        </div>
+
+        <div className="relative z-10 mt-6 grid grid-cols-3 gap-2 sm:gap-3">
+          {[
+            { label: 'ดอกเบี้ย', value: totalInterest, icon: TrendingUp, tone: 'text-amber-200' },
+            { label: 'ฝากสะสม', value: totalDeposited, icon: ArrowDownLeft, tone: 'text-emerald-100' },
+            { label: 'ถอนสะสม', value: totalWithdrawn, icon: ArrowUpRight, tone: 'text-rose-200' },
+          ].map(({ label, value, icon: Icon, tone }) => (
+            <div key={label} className="rounded-2xl bg-white/10 border border-white/15 backdrop-blur-sm px-3 py-2.5 min-w-0">
+              <div className={`flex items-center gap-1 text-[10px] sm:text-[11px] ${tone}`}>
+                <Icon className="w-3 h-3 shrink-0" /> <span className="truncate">{label}</span>
+              </div>
+              <div className="mt-0.5 text-[13px] sm:text-base font-bold font-mono whitespace-nowrap tracking-tight">฿{formatCurrency(value)}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Quick actions */}
+      <div className="grid grid-cols-4 gap-2.5 sm:gap-4">
+        {([
+          { tab: 'deposit', label: 'ฝากเงิน', icon: ArrowDownLeft, style: 'bg-emerald-50 text-emerald-700 ring-emerald-100' },
+          { tab: 'withdraw', label: 'ถอนเงิน', icon: ArrowUpRight, style: 'bg-rose-50 text-rose-600 ring-rose-100' },
+          { tab: 'history', label: 'ประวัติ', icon: Clock, style: 'bg-sky-50 text-sky-600 ring-sky-100' },
+          { tab: 'accounts', label: 'บัญชี', icon: CreditCard, style: 'bg-amber-50 text-amber-600 ring-amber-100' },
+        ] as const).map(({ tab, label, icon: Icon, style }) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => onNavigateTab(tab)}
+            className="flex flex-col items-center gap-1.5 py-3 rounded-3xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all cursor-pointer"
+          >
+            <span className={`w-12 h-12 rounded-2xl ring-1 flex items-center justify-center ${style}`}>
+              <Icon className="w-5 h-5" />
+            </span>
+            <span className="text-xs font-semibold text-slate-700">{label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Account cards */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <h3 className="text-sm font-bold text-slate-900">บัญชีเงินฝากของคุณ</h3>
+          <button type="button" onClick={() => onNavigateTab('accounts')} className="text-xs text-emerald-700 font-semibold inline-flex items-center gap-1 cursor-pointer">
+            ดูทั้งหมด <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+        <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 pb-2 scrollbar-none">
+          {memberAccounts.map((acc) => {
+            const special = acc.accountType === 'ออมทรัพย์พิเศษ';
+            return (
+              <div
+                key={acc.accountNo}
+                className={`snap-start shrink-0 w-[78%] sm:w-80 rounded-3xl p-4 text-white shadow-lg relative overflow-hidden ${
+                  special
+                    ? 'bg-gradient-to-br from-slate-800 via-slate-800 to-emerald-900 shadow-slate-900/20'
+                    : 'bg-gradient-to-br from-teal-500 to-emerald-700 shadow-emerald-900/20'
+                }`}
+              >
+                <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10"></div>
+                <div className="relative flex items-center justify-between">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/20">{acc.accountType}</span>
+                  <CreditCard className="w-4 h-4 opacity-70" />
+                </div>
+                <div className="relative mt-4 font-mono text-sm tracking-widest opacity-90">{formatAccountNo(acc.accountNo)}</div>
+                <div className="relative mt-3 text-[10px] opacity-70">ยอดคงเหลือ</div>
+                <div className="relative text-2xl font-bold font-mono">฿{formatCurrency(acc.balance)}</div>
+                <div className="relative mt-3 flex items-center justify-between">
+                  <span className="text-[11px] text-amber-200">ดอกเบี้ย ฿{formatCurrency(acc.accruedInterest)}</span>
+                  <div className="flex gap-1.5">
+                    <button type="button" onClick={() => onQuickAction(acc, 'deposit')} className="px-3 py-1 rounded-full bg-white text-emerald-700 text-[11px] font-bold active:scale-95 transition-transform cursor-pointer">ฝาก</button>
+                    <button type="button" onClick={() => onQuickAction(acc, 'withdraw')} className="px-3 py-1 rounded-full bg-white/20 hover:bg-white/30 text-white text-[11px] font-bold active:scale-95 transition-all cursor-pointer">ถอน</button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Recent Activity Feed */}
+      <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-2xs space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-slate-600" />
+              ธุรกรรมล่าสุด
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              รายการฝาก-ถอนล่าสุดที่บันทึกเข้าระบบ
             </p>
           </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => onNavigateTab('deposit')}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-all shadow-md shadow-emerald-700/30 active:scale-95 cursor-pointer"
-            >
-              <ArrowDownLeft className="w-4 h-4" />
-              <span>ฝากเงิน</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => onNavigateTab('withdraw')}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs transition-all shadow-md shadow-rose-700/30 active:scale-95 cursor-pointer"
-            >
-              <ArrowUpRight className="w-4 h-4" />
-              <span>ถอนเงิน</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => onNavigateTab('history')}
+            className="text-xs text-emerald-700 hover:underline font-semibold flex items-center gap-1"
+          >
+            <span>ดูทั้งหมด ({memberTransactions.length})</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
         </div>
+
+        {recentTransactions.length > 0 ? (
+          <div className="divide-y divide-slate-100">
+            {recentTransactions.map((t) => {
+              const isDeposit = t.type === 'deposit';
+              return (
+                <div
+                  key={t.id}
+                  className="py-3 flex items-center justify-between gap-3 hover:bg-slate-50/70 px-2 rounded-xl transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                        isDeposit
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-rose-100 text-rose-700'
+                      }`}
+                    >
+                      {isDeposit ? (
+                        <ArrowDownLeft className="w-4 h-4" />
+                      ) : (
+                        <ArrowUpRight className="w-4 h-4" />
+                      )}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-800">
+                          {isDeposit ? 'ฝากเงินเข้าบัญชี' : 'ถอนเงินออกจากบัญชี'}
+                        </span>
+                        <span className="hidden sm:inline text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded">
+                          {t.refCode}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400">
+                        {formatThaiDateTime(t.dateTime)} • บัญชี {formatAccountNo(t.accountNo)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <span
+                      className={`text-xs font-bold font-mono ${
+                        isDeposit ? 'text-emerald-600' : 'text-rose-600'
+                      }`}
+                    >
+                      {isDeposit ? '+' : '-'}฿{formatCurrency(t.amount)}
+                    </span>
+                    <p className="text-[10px] text-slate-400 font-mono">
+                      คงเหลือ: ฿{formatCurrency(t.balanceAfter)}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="py-6 text-center text-xs text-slate-400">
+            ยังไม่มีรายการธุรกรรมล่าสุด สามารถเริ่มทำรายการฝากหรือถอนเงินได้ทันที
+          </div>
+        )}
       </div>
 
-      {/* 4 Financial Status KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        {/* 1. Total Balance */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs relative overflow-hidden group hover:border-emerald-300 transition-all">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-medium">ยอดเงินคงเหลือรวมทุกบัญชี</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <Wallet className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl font-bold text-slate-900 font-mono tracking-tight">
-            ฿{formatCurrency(totalBalance)}
-          </div>
-          <div className="mt-2 flex items-center justify-between text-[11px]">
-            <span className="text-slate-400">จาก {memberAccounts.length} บัญชีเงินฝาก</span>
-            <span className="text-emerald-700 font-medium bg-emerald-50 px-2 py-0.5 rounded-md">
-              พร้อมทำรายการ
-            </span>
-          </div>
-        </div>
-
-        {/* 2. Total Accrued Interest */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs relative overflow-hidden group hover:border-amber-300 transition-all">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-medium">ดอกเบี้ยสะสมทั้งหมด</span>
-            <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl font-bold text-amber-600 font-mono tracking-tight">
-            ฿{formatCurrency(totalInterest)}
-          </div>
-          <div className="mt-2 flex items-center justify-between text-[11px]">
-            <span className="text-slate-400">อัตราดอกเบี้ย 1.75 - 2.75%</span>
-            <span className="text-amber-700 font-medium bg-amber-50 px-2 py-0.5 rounded-md">
-              ผลตอบแทนสูง
-            </span>
-          </div>
-        </div>
-
-        {/* 3. Total Deposited */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs relative overflow-hidden group hover:border-emerald-300 transition-all">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-medium">ยอดเงินฝากเข้าสะสม</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <ArrowDownLeft className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl font-bold text-emerald-600 font-mono tracking-tight">
-            ฿{formatCurrency(totalDeposited)}
-          </div>
-          <div className="mt-2 flex items-center justify-between text-[11px]">
-            <span className="text-slate-400">
-              {memberTransactions.filter((t) => t.type === 'deposit').length} รายการ
-            </span>
-            <span className="text-emerald-700 font-medium bg-emerald-50 px-2 py-0.5 rounded-md">
-              เงินไหลเข้า
-            </span>
-          </div>
-        </div>
-
-        {/* 4. Total Withdrawn */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs relative overflow-hidden group hover:border-rose-300 transition-all">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-medium">ยอดเงินถอนสะสม</span>
-            <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
-              <ArrowUpRight className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl font-bold text-rose-600 font-mono tracking-tight">
-            ฿{formatCurrency(totalWithdrawn)}
-          </div>
-          <div className="mt-2 flex items-center justify-between text-[11px]">
-            <span className="text-slate-400">
-              {memberTransactions.filter((t) => t.type === 'withdraw').length} รายการ
-            </span>
-            <span className="text-rose-700 font-medium bg-rose-50 px-2 py-0.5 rounded-md">
-              เงินโอนออก
-            </span>
-          </div>
-        </div>
-      </div>
+      <h3 className="pt-2 px-1 text-sm font-bold text-slate-900 flex items-center gap-1.5">
+        <Activity className="w-4 h-4 text-emerald-600" /> สถิติและแนวโน้ม
+      </h3>
 
       {/* Main Charts Section (Balance Trend & Inflow vs Outflow) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -487,7 +548,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Second Row: Monthly Flow Comparison + User's Accounts Quick Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Monthly Flow Chart (Deposit vs Withdraw BarChart) */}
-        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-5 shadow-2xs space-y-4">
+        <div className="lg:col-span-3 bg-white border border-slate-200 rounded-3xl p-5 shadow-2xs space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
@@ -545,151 +606,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
         </div>
 
-        {/* Member Accounts Quick Switcher & Balance List */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-              <CreditCard className="w-4 h-4 text-emerald-600" />
-              บัญชีเงินฝากของคุณ
-            </h3>
-            <span className="text-[11px] text-emerald-600 font-medium">คลิกทำรายการด่วน</span>
-          </div>
-
-          <div className="space-y-2.5">
-            {memberAccounts.map((acc) => (
-              <div
-                key={acc.id}
-                className="p-3 rounded-2xl border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all space-y-2"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-slate-900">
-                    {formatAccountNo(acc.accountNo)}
-                  </span>
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                      acc.accountType === 'ออมทรัพย์พิเศษ'
-                        ? 'bg-teal-100 text-teal-800'
-                        : 'bg-emerald-100 text-emerald-800'
-                    }`}
-                  >
-                    {acc.accountType}
-                  </span>
-                </div>
-
-                <div className="flex items-baseline justify-between">
-                  <span className="text-[11px] text-slate-500">ยอดคงเหลือ:</span>
-                  <span className="font-mono font-bold text-sm text-emerald-700">
-                    ฿{formatCurrency(acc.balance)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
-                  <span className="text-amber-600">ดอกเบี้ย ฿{formatCurrency(acc.accruedInterest)}</span>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => onQuickAction(acc, 'deposit')}
-                      className="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-medium"
-                    >
-                      ฝาก
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onQuickAction(acc, 'withdraw')}
-                      className="px-2 py-0.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-[10px] font-medium"
-                    >
-                      ถอน
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
-      {/* Recent Activity Feed */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-2xs space-y-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-slate-600" />
-              กิจกรรมธุรกรรมล่าสุด (Recent Transactions)
-            </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              รายการฝาก-ถอนล่าสุดที่บันทึกเข้าระบบ
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => onNavigateTab('history')}
-            className="text-xs text-emerald-700 hover:underline font-semibold flex items-center gap-1"
-          >
-            <span>ดูทั้งหมด ({memberTransactions.length})</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        {recentTransactions.length > 0 ? (
-          <div className="divide-y divide-slate-100">
-            {recentTransactions.map((t) => {
-              const isDeposit = t.type === 'deposit';
-              return (
-                <div
-                  key={t.id}
-                  className="py-3 flex items-center justify-between gap-3 hover:bg-slate-50/70 px-2 rounded-xl transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                        isDeposit
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-rose-100 text-rose-700'
-                      }`}
-                    >
-                      {isDeposit ? (
-                        <ArrowDownLeft className="w-4 h-4" />
-                      ) : (
-                        <ArrowUpRight className="w-4 h-4" />
-                      )}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-800">
-                          {isDeposit ? 'ฝากเงินเข้าบัญชี' : 'ถอนเงินออกจากบัญชี'}
-                        </span>
-                        <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded">
-                          {t.refCode}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-400">
-                        {formatThaiDateTime(t.dateTime)} • บัญชี {formatAccountNo(t.accountNo)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <span
-                      className={`text-xs font-bold font-mono ${
-                        isDeposit ? 'text-emerald-600' : 'text-rose-600'
-                      }`}
-                    >
-                      {isDeposit ? '+' : '-'}฿{formatCurrency(t.amount)}
-                    </span>
-                    <p className="text-[10px] text-slate-400 font-mono">
-                      คงเหลือ: ฿{formatCurrency(t.balanceAfter)}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="py-6 text-center text-xs text-slate-400">
-            ยังไม่มีรายการธุรกรรมล่าสุด สามารถเริ่มทำรายการฝากหรือถอนเงินได้ทันที
-          </div>
-        )}
-      </div>
     </div>
   );
 };

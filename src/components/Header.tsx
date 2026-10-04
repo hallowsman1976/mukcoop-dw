@@ -1,6 +1,6 @@
 import { SYSTEM_NAME, COOP_NAME } from '../constants/brand';
 import { BrandLogo } from './BrandLogo';
-import React from 'react';
+import React, { useState } from 'react';
 import { Member, BankAccount, AdminUser } from '../types';
 import { formatCurrency } from '../utils/thaiBahtText';
 import {
@@ -19,6 +19,7 @@ import {
   Bell,
   BellOff,
   Coins,
+  Menu,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -54,6 +55,8 @@ export const Header: React.FC<HeaderProps> = ({
   logoUrl,
   coopName,
 }) => {
+  const [showMore, setShowMore] = useState(false);
+
   // Compute total balance for this member
   const memberAccounts = currentMember
     ? accounts.filter((a) => a.memberId === currentMember.memberId)
@@ -61,8 +64,10 @@ export const Header: React.FC<HeaderProps> = ({
   const totalMemberBalance = memberAccounts.reduce((sum, a) => sum + a.balance, 0);
 
   return (
+    <>
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
       {/* Top micro bar: LINE LIFF & Google Apps Script status badges */}
+      {!currentMember && (
       <div className="bg-slate-900 text-slate-300 px-4 py-1.5 text-[11px] flex items-center justify-between">
         <div className="hidden sm:flex items-center gap-3 min-w-0">
           <span className="flex items-center gap-1.5 text-emerald-400 font-medium whitespace-nowrap">
@@ -132,6 +137,7 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
       </div>
+      )}
 
       {/* Main navigation row */}
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
@@ -196,7 +202,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Tabs navigation if logged in */}
       {currentMember && (
-        <div className="border-t border-slate-100 bg-slate-50/70 px-4">
+        <div className="hidden md:block border-t border-slate-100 bg-slate-50/70 px-4">
           <div className="max-w-6xl mx-auto flex items-center gap-1 overflow-x-auto py-1.5 scrollbar-none">
             <button
               onClick={() => onSelectTab('dashboard')}
@@ -297,5 +303,90 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       )}
     </header>
+
+      {/* Mobile bottom navigation (member portal) */}
+      {currentMember && (
+        <>
+          {showMore && (
+            <div className="md:hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[2px]" onClick={() => setShowMore(false)}>
+              <div
+                className="absolute left-3 right-3 bottom-24 bg-white rounded-3xl shadow-2xl border border-slate-200 p-2 animate-in slide-in-from-bottom-4 fade-in duration-150"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {([
+                  { tab: 'accounts', label: 'ตารางข้อมูลบัญชีเงินฝาก', icon: ListOrdered, color: 'text-emerald-600 bg-emerald-50' },
+                  { tab: 'loans', label: 'สินเชื่อและผ่อนชำระ', icon: Coins, color: 'text-indigo-600 bg-indigo-50' },
+                  { tab: 'notifications', label: 'การแจ้งเตือน LINE', icon: Bell, color: 'text-[#06C755] bg-green-50' },
+                ] as const).map(({ tab, label, icon: Icon, color }) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => { onSelectTab(tab); setShowMore(false); }}
+                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-sm font-medium text-left transition-colors ${
+                      activeTab === tab ? 'bg-slate-100 text-slate-900' : 'text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span className={`w-9 h-9 rounded-xl flex items-center justify-center ${color}`}>
+                      <Icon className="w-4 h-4" />
+                    </span>
+                    {label}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => { setShowMore(false); onLogout(); }}
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-sm font-medium text-left text-rose-600 hover:bg-rose-50 transition-colors"
+                >
+                  <span className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50">
+                    <LogOut className="w-4 h-4" />
+                  </span>
+                  ออกจากระบบ
+                </button>
+              </div>
+            </div>
+          )}
+
+          <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+            <div className="max-w-md mx-auto grid grid-cols-5 gap-1">
+              {([
+                { tab: 'dashboard', label: 'หน้าหลัก', icon: LayoutDashboard },
+                { tab: 'deposit', label: 'ฝากเงิน', icon: ArrowDownLeft },
+                { tab: 'withdraw', label: 'ถอนเงิน', icon: ArrowUpRight },
+                { tab: 'history', label: 'ประวัติ', icon: History },
+              ] as const).map(({ tab, label, icon: Icon }) => {
+                const active = activeTab === tab && !showMore;
+                return (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => { setShowMore(false); onSelectTab(tab); }}
+                    className={`flex flex-col items-center gap-0.5 py-1.5 rounded-2xl text-[10px] font-semibold transition-all ${
+                      active ? 'text-emerald-700' : 'text-slate-400'
+                    }`}
+                  >
+                    <span className={`w-11 h-7 rounded-full flex items-center justify-center transition-all ${active ? 'bg-emerald-100' : ''}`}>
+                      <Icon className="w-5 h-5" />
+                    </span>
+                    {label}
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => setShowMore((v) => !v)}
+                className={`flex flex-col items-center gap-0.5 py-1.5 rounded-2xl text-[10px] font-semibold transition-all ${
+                  showMore || ['accounts', 'loans', 'notifications'].includes(activeTab) ? 'text-emerald-700' : 'text-slate-400'
+                }`}
+              >
+                <span className={`w-11 h-7 rounded-full flex items-center justify-center ${showMore || ['accounts', 'loans', 'notifications'].includes(activeTab) ? 'bg-emerald-100' : ''}`}>
+                  <Menu className="w-5 h-5" />
+                </span>
+                เมนูอื่นๆ
+              </button>
+            </div>
+          </nav>
+        </>
+      )}
+  </>
   );
 };
