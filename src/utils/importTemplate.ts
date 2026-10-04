@@ -1,25 +1,20 @@
 /**
- * Utilities and constants for the 8-column initial savings accounts import template.
- * ตารางข้อมูลบัญชีเงินฝากเริ่มต้น (8 คอลัมน์):
- * 1. ลำดับ
- * 2. หมายเลขบัญชี
- * 3. รหัสสมาชิก
- * 4. หมายเลขบัตรประชาชน
- * 5. ชื่อบัญชีเงินฝาก
- * 6. ข้อมูลติดต่อล่าสุด
- * 7. ยอดคงเหลือ
- * 8. ดอกเบี้ยสะสม
+ * Import template for the initial savings accounts table.
+ * Columns follow the "Accounts" sheet order (gas/Db.js). interestRate and
+ * lastUpdated are filled in by the server, so they are not part of the file.
+ *
+ *   accountNo, memberId, citizenId, accountName, accountType, balance, accruedInterest, contact
  */
 
-export const IMPORT_TEMPLATE_8COL_HEADERS = [
-  'ลำดับ',
+export const IMPORT_TEMPLATE_HEADERS = [
   'หมายเลขบัญชี',
   'รหัสสมาชิก',
   'หมายเลขบัตรประชาชน',
   'ชื่อบัญชีเงินฝาก',
-  'ข้อมูลติดต่อล่าสุด',
+  'ประเภทบัญชี',
   'ยอดคงเหลือ',
   'ดอกเบี้ยสะสม',
+  'ข้อมูลติดต่อล่าสุด',
 ] as const;
 
 export interface TemplateColumnDef {
@@ -31,13 +26,6 @@ export interface TemplateColumnDef {
 }
 
 export const IMPORT_TEMPLATE_COLUMNS: TemplateColumnDef[] = [
-  {
-    key: 'no',
-    name: 'ลำดับ',
-    example: '1',
-    description: 'ลำดับรายการ (เช่น 1, 2, 3...)',
-    required: true,
-  },
   {
     key: 'accountNo',
     name: 'หมายเลขบัญชี',
@@ -67,10 +55,10 @@ export const IMPORT_TEMPLATE_COLUMNS: TemplateColumnDef[] = [
     required: true,
   },
   {
-    key: 'contact',
-    name: 'ข้อมูลติดต่อล่าสุด',
-    example: '089-123-4567',
-    description: 'เบอร์โทรศัพท์ติดต่อ หรือ LINE ID สำหรับการแจ้งเตือน',
+    key: 'accountType',
+    name: 'ประเภทบัญชี',
+    example: 'ออมทรัพย์',
+    description: 'ออมทรัพย์ หรือ ออมทรัพย์พิเศษ (หากเว้นว่าง ระบบดูจากเลขบัญชีที่ขึ้นต้น 201)',
     required: false,
   },
   {
@@ -87,22 +75,29 @@ export const IMPORT_TEMPLATE_COLUMNS: TemplateColumnDef[] = [
     description: 'ยอดดอกเบี้ยสะสมรอจ่ายถึงปัจจุบัน (บาท)',
     required: false,
   },
+  {
+    key: 'contact',
+    name: 'ข้อมูลติดต่อล่าสุด',
+    example: '089-123-4567',
+    description: 'เบอร์โทรศัพท์ติดต่อ หรือ LINE ID สำหรับการแจ้งเตือน',
+    required: false,
+  },
 ];
 
-export const IMPORT_TEMPLATE_8COL_CSV =
-  `ลำดับ,หมายเลขบัญชี,รหัสสมาชิก,หมายเลขบัตรประชาชน,ชื่อบัญชีเงินฝาก,ข้อมูลติดต่อล่าสุด,ยอดคงเหลือ,ดอกเบี้ยสะสม
-1,101-2-00128-1,00128,1100200345670,นายสมชาย ใจดี,089-123-4567,148500.00,1250.75
-2,201-5-00128-2,00128,1100200345670,นายสมชาย ใจดี (เงินฝากพิเศษเพื่อการศึกษา),089-123-4567,320000.00,4800.00
-3,101-2-00405-1,00405,1200100456789,นางสาววิภาภรณ์ รัตนโชติ,081-987-6543,85200.50,742.30
-4,201-5-00405-2,00405,1200100456789,นางสาววิภาภรณ์ รัตนโชติ (ออมทรัพย์พิเศษ),081-987-6543,210000.00,3150.00
-5,101-2-01024-1,01024,3100500987654,นายชาญชัย มั่งคั่งเจริญ,086-555-8899,550000.00,6850.25`;
+export const IMPORT_TEMPLATE_CSV =
+  `${IMPORT_TEMPLATE_HEADERS.join(',')}
+101-2-00128-1,00128,1100200345670,นายสมชาย ใจดี,ออมทรัพย์,148500.00,1250.75,089-123-4567
+201-5-00128-2,00128,1100200345670,นายสมชาย ใจดี (เงินฝากพิเศษเพื่อการศึกษา),ออมทรัพย์พิเศษ,320000.00,4800.00,089-123-4567
+101-2-00405-1,00405,1200100456789,นางสาววิภาภรณ์ รัตนโชติ,ออมทรัพย์,85200.50,742.30,081-987-6543
+201-5-00405-2,00405,1200100456789,นางสาววิภาภรณ์ รัตนโชติ (ออมทรัพย์พิเศษ),ออมทรัพย์พิเศษ,210000.00,3150.00,081-987-6543
+101-2-01024-1,01024,3100500987654,นายชาญชัย มั่งคั่งเจริญ,ออมทรัพย์,550000.00,6850.25,086-555-8899`;
 
 /**
  * Direct browser trigger to download the CSV template with UTF-8 BOM
  * so Excel opens it with Thai characters rendered flawlessly.
  */
 export function downloadImportTemplateCsv(filename: string = 'import_template.csv'): void {
-  const contentWithBom = '\uFEFF' + IMPORT_TEMPLATE_8COL_CSV;
+  const contentWithBom = '\uFEFF' + IMPORT_TEMPLATE_CSV;
   const blob = new Blob([contentWithBom], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');

@@ -96,10 +96,10 @@ export const AccountsTable: React.FC<AccountsTableProps> = ({
               type="button"
               onClick={() => downloadImportTemplateCsv('import_template.csv')}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold transition-all shadow-xs cursor-pointer"
-              title="ดาวน์โหลดไฟล์ import_template.csv (โครงสร้าง 8 คอลัมน์ตรงตามตารางนี้)"
+              title="ดาวน์โหลดไฟล์ import_template.csv (โครงสร้างตาม sheet Accounts)"
             >
               <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
-              <span>ดาวน์โหลด import_template (8 คอลัมน์)</span>
+              <span>ดาวน์โหลด import_template</span>
             </button>
 
             <button

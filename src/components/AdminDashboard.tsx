@@ -993,7 +993,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="text-sm font-bold text-slate-900">
-                  บัญชีเงินฝากสหกรณ์ทั้งหมด ({accounts.length} บัญชี) - ตารางข้อมูล 8 คอลัมน์มาตรฐาน
+                  บัญชีเงินฝากสหกรณ์ทั้งหมด ({accounts.length} บัญชี)
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
                   ตรวจสอบยอดคงเหลือ ดอกเบี้ยสะสม ข้อมูลติดต่อ และเปิดบัญชีเงินฝากเล่มใหม่ให้สมาชิก
@@ -1007,7 +1007,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   title="ดาวน์โหลดไฟล์ import_template.csv สำหรับนำเข้าข้อมูลเริ่มต้น"
                 >
                   <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-                  <span>ดาวน์โหลด import_template (8 คอลัมน์)</span>
+                  <span>ดาวน์โหลด import_template</span>
                 </button>
                 <button
                   type="button"

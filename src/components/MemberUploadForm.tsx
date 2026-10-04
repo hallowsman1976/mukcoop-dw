@@ -11,9 +11,8 @@ import {
   isValidCitizenId,
 } from '../utils/validators';
 import {
-  IMPORT_TEMPLATE_8COL_CSV,
+  IMPORT_TEMPLATE_CSV,
   downloadImportTemplateCsv,
-  IMPORT_TEMPLATE_8COL_HEADERS,
   IMPORT_TEMPLATE_COLUMNS,
 } from '../utils/importTemplate';
 import confetti from 'canvas-confetti';
@@ -101,13 +100,31 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
 
     // Check if first line is a header
     const firstLineLower = lines[0].toLowerCase();
-    const is8ColHeader =
-      firstLineLower.includes('ลำดับ') ||
-      firstLineLower.includes('ยอดคงเหลือ') ||
-      firstLineLower.includes('ดอกเบี้ย');
+    const splitLine = (l: string) =>
+      l.includes('	') ? l.split('	') : l.includes(';') ? l.split(';') : l.split(',');
+    const headerCells = splitLine(lines[0]).map((c) => c.replace(/['"]/g, '').trim());
+    const colIndex = (name: string) => headerCells.indexOf(name);
+    // Header row of the Accounts-sheet template: map columns by name so the order may vary.
+    const isTemplateHeader = colIndex('หมายเลขบัญชี') >= 0 && colIndex('รหัสสมาชิก') >= 0;
+    const cols = isTemplateHeader
+      ? {
+          no: colIndex('ลำดับ'),
+          accountNo: colIndex('หมายเลขบัญชี'),
+          memberId: colIndex('รหัสสมาชิก'),
+          citizenId: colIndex('หมายเลขบัตรประชาชน'),
+          accountName: colIndex('ชื่อบัญชีเงินฝาก'),
+          accountType: colIndex('ประเภทบัญชี'),
+          balance: colIndex('ยอดคงเหลือ'),
+          accruedInterest: colIndex('ดอกเบี้ยสะสม'),
+          contact: colIndex('ข้อมูลติดต่อล่าสุด'),
+        }
+      : null;
 
     const startIndex =
-      is8ColHeader ||
+      isTemplateHeader ||
+      firstLineLower.includes('ลำดับ') ||
+      firstLineLower.includes('ยอดคงเหลือ') ||
+      firstLineLower.includes('ดอกเบี้ย') ||
       firstLineLower.includes('รหัส') ||
       firstLineLower.includes('member') ||
       firstLineLower.includes('citizen') ||
@@ -119,12 +136,9 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
       const line = lines[i].trim();
       if (!line) continue;
 
-      // Split by comma or tab or semicolon
-      const parts = line.includes('\t')
-        ? line.split('\t')
-        : line.includes(';')
-        ? line.split(';')
-        : line.split(',');
+      const parts = splitLine(line);
+      const clean = (v?: string) => (v || '').replace(/['"]/g, '').trim();
+      const num = (v?: string) => parseFloat((v || '').replace(/[^0-9.]/g, '')) || 0;
 
       let rowNo: number | undefined = undefined;
       let rawMId = '';
@@ -136,20 +150,28 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
       let rawDeposit = 500;
       let rawAccruedInterest = 0;
 
-      // Detect if row matches 8-column table format (ลำดับ, หมายเลขบัญชี, รหัสสมาชิก, เลขบัตรประชาชน, ชื่อบัญชีเงินฝาก, ข้อมูลติดต่อล่าสุด, ยอดคงเหลือ, ดอกเบี้ยสะสม)
-      if (is8ColHeader || parts.length >= 8) {
-        rowNo = parseInt((parts[0] || '').replace(/[^0-9]/g, ''), 10) || i + 1;
-        rawAccNo = (parts[1] || '').replace(/['"]/g, '').trim();
-        rawMId = (parts[2] || '').replace(/['"]/g, '').trim();
-        rawCId = (parts[3] || '').replace(/[^0-9]/g, '').trim();
-        rawName = (parts[4] || '').replace(/['"]/g, '').trim();
-        rawPhone = (parts[5] || '').replace(/['"]/g, '').trim();
-        rawDeposit = parseFloat((parts[6] || '').replace(/[^0-9.]/g, '')) || 0;
-        rawAccruedInterest = parseFloat((parts[7] || '').replace(/[^0-9.]/g, '')) || 0;
-        rawAccType =
-          rawAccNo.startsWith('201') || rawName.includes('พิเศษ')
-            ? 'ออมทรัพย์พิเศษ'
-            : 'ออมทรัพย์';
+      if (cols) {
+        const at = (idx: number) => (idx >= 0 ? parts[idx] : '');
+        rowNo = cols.no >= 0 ? parseInt(clean(at(cols.no)), 10) || undefined : undefined;
+        rawAccNo = clean(at(cols.accountNo));
+        rawMId = clean(at(cols.memberId));
+        rawCId = clean(at(cols.citizenId)).replace(/[^0-9]/g, '');
+        rawName = clean(at(cols.accountName));
+        rawAccType = clean(at(cols.accountType));
+        rawDeposit = num(at(cols.balance));
+        rawAccruedInterest = num(at(cols.accruedInterest));
+        rawPhone = clean(at(cols.contact));
+      } else if (parts.length >= 8) {
+        // Headerless Accounts-sheet order:
+        // accountNo, memberId, citizenId, accountName, accountType, balance, accruedInterest, contact
+        rawAccNo = clean(parts[0]);
+        rawMId = clean(parts[1]);
+        rawCId = clean(parts[2]).replace(/[^0-9]/g, '');
+        rawName = clean(parts[3]);
+        rawAccType = clean(parts[4]);
+        rawDeposit = num(parts[5]);
+        rawAccruedInterest = num(parts[6]);
+        rawPhone = clean(parts[7]);
       } else if (parts.length >= 7) {
         // Format: MemberID, CitizenID, Name, AccountNo, Phone, AccountType, Deposit
         rawMId = (parts[0] || '').replace(/['"]/g, '').trim();
@@ -285,11 +307,11 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
 
   // Load sample 8-column demo data
   const handleLoadDemoTemplate = () => {
-    setRawText(IMPORT_TEMPLATE_8COL_CSV);
+    setRawText(IMPORT_TEMPLATE_CSV);
     setActiveInputMethod('paste');
     setSelectedFileName('import_template_sample.csv');
     setFileSizeStr('1.8 KB');
-    parseContent(IMPORT_TEMPLATE_8COL_CSV);
+    parseContent(IMPORT_TEMPLATE_CSV);
   };
 
   // Download Official 8-column CSV Template (import_template.csv)
@@ -300,7 +322,7 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
   // Copy 8-column template CSV to clipboard
   const handleCopyTemplate = async () => {
     try {
-      await navigator.clipboard.writeText(IMPORT_TEMPLATE_8COL_CSV);
+      await navigator.clipboard.writeText(IMPORT_TEMPLATE_CSV);
       setCopiedTemplate(true);
       setTimeout(() => setCopiedTemplate(false), 2500);
     } catch {
@@ -405,14 +427,14 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="text-sm font-bold text-slate-900">
-                    โครงสร้างแม่แบบนำเข้า: ตารางข้อมูลบัญชีเงินฝากเริ่มต้น (8 คอลัมน์)
+                    โครงสร้างแม่แบบนำเข้า: ตารางข้อมูลบัญชีเงินฝากเริ่มต้น (ตาม sheet Accounts)
                   </h3>
                   <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-300">
                     import_template.csv
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  ตารางแม่แบบมาตรฐาน 8 คอลัมน์ สำหรับตั้งต้นฐานข้อมูลสมาชิกและบัญชีเงินฝาก
+                  ตารางแม่แบบเรียงคอลัมน์ตาม sheet Accounts สำหรับตั้งต้นฐานข้อมูลสมาชิกและบัญชีเงินฝาก
                 </p>
               </div>
             </div>
@@ -422,7 +444,7 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
                 type="button"
                 onClick={handleDownloadTemplate}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-all cursor-pointer"
-                title="ดาวน์โหลด import_template.csv (โครงสร้าง 8 คอลัมน์)"
+                title="ดาวน์โหลด import_template.csv (โครงสร้างตาม sheet Accounts)"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>ดาวน์โหลด import_template.csv</span>
@@ -431,7 +453,7 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
                 type="button"
                 onClick={handleCopyTemplate}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-300 rounded-xl text-xs font-semibold transition-all cursor-pointer"
-                title="คัดลอกรูปแบบแม่แบบ CSV 8 คอลัมน์"
+                title="คัดลอกรูปแบบแม่แบบ CSV"
               >
                 {copiedTemplate ? (
                   <>
@@ -449,10 +471,10 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
                 type="button"
                 onClick={handleLoadDemoTemplate}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-xl text-xs font-semibold transition-all cursor-pointer"
-                title="ใส่ข้อมูลตัวอย่าง 8 คอลัมน์ลงในแบบฟอร์ม"
+                title="ใส่ข้อมูลตัวอย่างลงในแบบฟอร์ม"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                <span>โหลดตัวอย่าง 8 คอลัมน์</span>
+                <span>โหลดตัวอย่าง</span>
               </button>
             </div>
           </div>
@@ -462,7 +484,7 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
             <table className="w-full text-left border-collapse text-[11px]">
               <thead>
                 <tr className="bg-slate-50 border-b border-indigo-100 text-slate-700 font-semibold">
-                  <th className="py-2 px-2.5 text-center w-10">ลำดับ</th>
+                  <th className="py-2 px-2.5 text-center w-10">คอลัมน์</th>
                   <th className="py-2 px-2.5">ชื่อคอลัมน์ (Headers)</th>
                   <th className="py-2 px-2.5">ตัวอย่างข้อมูล (Sample)</th>
                   <th className="py-2 px-2.5">คำอธิบายและข้อกำหนด</th>
@@ -535,7 +557,7 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
             className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>โหลดตัวอย่างแม่แบบ 8 คอลัมน์</span>
+            <span>โหลดตัวอย่างแม่แบบ</span>
           </button>
         </div>
 
@@ -607,11 +629,11 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
         {activeInputMethod === 'paste' && (
           <div className="space-y-2">
             <label className="text-xs font-semibold text-slate-700 block">
-              วางข้อความ CSV (รูปแบบ 8 คอลัมน์: ลำดับ, หมายเลขบัญชี, รหัสสมาชิก, เลขบัตรประชาชน, ชื่อบัญชีเงินฝาก, ข้อมูลติดต่อล่าสุด, ยอดคงเหลือ, ดอกเบี้ยสะสม):
+              วางข้อความ CSV (คอลัมน์: หมายเลขบัญชี, รหัสสมาชิก, หมายเลขบัตรประชาชน, ชื่อบัญชีเงินฝาก, ประเภทบัญชี, ยอดคงเหลือ, ดอกเบี้ยสะสม, ข้อมูลติดต่อล่าสุด):
             </label>
             <textarea
               rows={5}
-              placeholder={`ลำดับ,หมายเลขบัญชี,รหัสสมาชิก,หมายเลขบัตรประชาชน,ชื่อบัญชีเงินฝาก,ข้อมูลติดต่อล่าสุด,ยอดคงเหลือ,ดอกเบี้ยสะสม\n1,101-2-00128-1,00128,1100200345670,นายสมชาย ใจดี,089-123-4567,148500.00,1250.75\n2,201-5-00128-2,00128,1100200345670,นายสมชาย ใจดี (เงินฝากพิเศษเพื่อการศึกษา),089-123-4567,320000.00,4800.00\n3,101-2-00405-1,00405,1200100456789,นางสาววิภาภรณ์ รัตนโชติ,081-987-6543,85200.50,742.30`}
+              placeholder={IMPORT_TEMPLATE_CSV.split('\n').slice(0, 4).join('\n')}
               value={rawText}
               onChange={(e) => {
                 setRawText(e.target.value);
@@ -672,7 +694,7 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div className="flex items-center gap-3 text-xs flex-wrap">
                 <span className="font-bold text-slate-900">
-                  ตรวจพบทั้งหมด {parsedRows.length} รายการ (ตารางข้อมูล 8 คอลัมน์):
+                  ตรวจพบทั้งหมด {parsedRows.length} รายการ :
                 </span>
                 <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full font-medium text-[11px] border border-emerald-200">
                   <CheckCircle2 className="w-3.5 h-3.5" /> ผ่าน {validCount}
@@ -694,19 +716,19 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
               </span>
             </div>
 
-            {/* Validation Table: Standard 8-Column Format */}
+            {/* Validation Table: Accounts-sheet column order */}
             <div className="overflow-x-auto rounded-2xl border border-slate-200 max-h-96 overflow-y-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead className="bg-slate-50 sticky top-0 z-10 border-b border-slate-200 text-slate-600 font-semibold whitespace-nowrap">
                   <tr>
-                    <th className="py-2.5 px-3 text-center w-12">1. ลำดับ</th>
-                    <th className="py-2.5 px-3 min-w-[130px]">2. หมายเลขบัญชี</th>
-                    <th className="py-2.5 px-3 min-w-[95px]">3. รหัสสมาชิก</th>
-                    <th className="py-2.5 px-3 min-w-[140px]">4. เลขบัตรประชาชน</th>
-                    <th className="py-2.5 px-3 min-w-[160px]">5. ชื่อบัญชีเงินฝาก</th>
-                    <th className="py-2.5 px-3 min-w-[120px]">6. ข้อมูลติดต่อล่าสุด</th>
-                    <th className="py-2.5 px-3 min-w-[110px] text-right">7. ยอดคงเหลือ</th>
-                    <th className="py-2.5 px-3 min-w-[110px] text-right">8. ดอกเบี้ยสะสม</th>
+                    <th className="py-2.5 px-3 min-w-[130px]">1. หมายเลขบัญชี</th>
+                    <th className="py-2.5 px-3 min-w-[95px]">2. รหัสสมาชิก</th>
+                    <th className="py-2.5 px-3 min-w-[140px]">3. เลขบัตรประชาชน</th>
+                    <th className="py-2.5 px-3 min-w-[160px]">4. ชื่อบัญชีเงินฝาก</th>
+                    <th className="py-2.5 px-3 min-w-[110px]">5. ประเภทบัญชี</th>
+                    <th className="py-2.5 px-3 min-w-[110px] text-right">6. ยอดคงเหลือ</th>
+                    <th className="py-2.5 px-3 min-w-[110px] text-right">7. ดอกเบี้ยสะสม</th>
+                    <th className="py-2.5 px-3 min-w-[120px]">8. ข้อมูลติดต่อล่าสุด</th>
                     <th className="py-2.5 px-3 text-center min-w-[110px]">ผลการตรวจสอบ</th>
                   </tr>
                 </thead>
@@ -718,12 +740,7 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
                         !r.isValid ? 'bg-rose-50/30' : r.isDuplicate ? 'bg-amber-50/20' : ''
                       }`}
                     >
-                      {/* 1. ลำดับ */}
-                      <td className="py-2.5 px-3 font-mono text-slate-400 text-center">
-                        {r.rowNo || r.index}
-                      </td>
-
-                      {/* 2. หมายเลขบัญชี */}
+                      {/* 1. หมายเลขบัญชี */}
                       <td className="py-2.5 px-3 font-mono whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
                           <span
@@ -735,15 +752,6 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
                           >
                             {r.accountNo}
                           </span>
-                          <span
-                            className={`text-[10px] px-1.5 py-0.2 rounded font-medium ${
-                              r.accountType === 'ออมทรัพย์พิเศษ'
-                                ? 'bg-teal-100 text-teal-800'
-                                : 'bg-emerald-100 text-emerald-800'
-                            }`}
-                          >
-                            {r.accountType}
-                          </span>
                         </div>
                         {r.rawAccountNo && r.rawAccountNo !== r.accountNo && (
                           <span className="text-[10px] text-slate-400 block mt-0.5">
@@ -752,7 +760,7 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
                         )}
                       </td>
 
-                      {/* 3. รหัสสมาชิก (5 หลัก) */}
+                      {/* 2. รหัสสมาชิก (5 หลัก) */}
                       <td className="py-2.5 px-3 font-mono whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
                           <span
@@ -777,22 +785,30 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
                         )}
                       </td>
 
-                      {/* 4. เลขประจำตัวประชาชน (13 หลัก) */}
+                      {/* 3. เลขประจำตัวประชาชน (13 หลัก) */}
                       <td className="py-2.5 px-3 font-mono text-slate-700 whitespace-nowrap">
                         {formatCitizenId(r.citizenId, true)}
                       </td>
 
-                      {/* 5. ชื่อบัญชีเงินฝาก */}
+                      {/* 4. ชื่อบัญชีเงินฝาก */}
                       <td className="py-2.5 px-3 font-medium text-slate-800 min-w-[160px]">
                         <div>{r.fullName}</div>
                       </td>
 
-                      {/* 6. ข้อมูลติดต่อล่าสุด */}
-                      <td className="py-2.5 px-3 text-slate-600 font-mono whitespace-nowrap">
-                        {r.phone || '-'}
+                      {/* 5. ประเภทบัญชี */}
+                      <td className="py-2.5 px-3 whitespace-nowrap">
+                        <span
+                          className={`text-[11px] px-2 py-0.5 rounded font-medium ${
+                            r.accountType === 'ออมทรัพย์พิเศษ'
+                              ? 'bg-teal-100 text-teal-800'
+                              : 'bg-emerald-100 text-emerald-800'
+                          }`}
+                        >
+                          {r.accountType}
+                        </span>
                       </td>
 
-                      {/* 7. ยอดคงเหลือ */}
+                      {/* 6. ยอดคงเหลือ */}
                       <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-600 whitespace-nowrap">
                         ฿{(r.initialDeposit || 0).toLocaleString(undefined, {
                           minimumFractionDigits: 2,
@@ -800,12 +816,17 @@ export const MemberUploadForm: React.FC<MemberUploadFormProps> = ({
                         })}
                       </td>
 
-                      {/* 8. ดอกเบี้ยสะสม */}
+                      {/* 7. ดอกเบี้ยสะสม */}
                       <td className="py-2.5 px-3 text-right font-mono text-amber-600 font-medium whitespace-nowrap">
                         ฿{(r.accruedInterest || 0).toLocaleString(undefined, {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
+                      </td>
+
+                      {/* 8. ข้อมูลติดต่อล่าสุด */}
+                      <td className="py-2.5 px-3 text-slate-600 font-mono whitespace-nowrap">
+                        {r.phone || '-'}
                       </td>
 
                       {/* 9. ผลการตรวจสอบ */}
