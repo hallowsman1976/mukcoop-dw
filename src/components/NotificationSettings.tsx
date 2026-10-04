@@ -8,15 +8,12 @@ import {
   BellRing,
   Smartphone,
   CheckCircle2,
-  AlertCircle,
   ArrowDownLeft,
   ArrowUpRight,
   Sparkles,
-  ShieldCheck,
   Send,
   Sliders,
   DollarSign,
-  MessageSquare,
 } from 'lucide-react';
 
 interface NotificationSettingsProps {
@@ -25,6 +22,33 @@ interface NotificationSettingsProps {
   onUpdateMember: (updatedMember: Member) => void;
   onTestPush: () => void;
 }
+
+const Toggle: React.FC<{ checked: boolean; onChange: () => void; tone?: string; label: string }> = ({
+  checked,
+  onChange,
+  tone = 'bg-[#06C755]',
+  label,
+}) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={checked}
+    aria-label={label}
+    onClick={(e) => {
+      e.stopPropagation();
+      onChange();
+    }}
+    className={`relative w-12 h-7 rounded-full shrink-0 transition-colors cursor-pointer ${
+      checked ? tone : 'bg-slate-300'
+    }`}
+  >
+    <span
+      className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform ${
+        checked ? 'translate-x-5' : ''
+      }`}
+    ></span>
+  </button>
+);
 
 export const NotificationSettings: React.FC<NotificationSettingsProps> = ({
   currentMember,
@@ -38,7 +62,7 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({
     notifyOnWithdraw: true,
     notifyOnInterest: true,
     minimumAmount: 0,
-    lineUserId: liffProfile?.userId || currentMember.lineUserId || 'U1a2b3c4d5e6f7g8',
+    lineUserId: liffProfile?.userId || currentMember.lineUserId || '',
   };
 
   const [settings, setSettings] = useState<LineNotificationSettings>(initialSettings);
@@ -100,254 +124,194 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({
     { label: '฿1,000 ขึ้นไป', value: 1000 },
   ];
 
+  const lineLinked =
+    !!liffProfile || !!currentMember.lineUserId || !!(currentMember as Member & { lineLinked?: boolean }).lineLinked;
+
+  const options: {
+    key: 'notifyOnDeposit' | 'notifyOnWithdraw' | 'notifyOnInterest';
+    title: string;
+    desc: string;
+    icon: React.ElementType;
+    iconCls: string;
+    tone: string;
+  }[] = [
+    {
+      key: 'notifyOnDeposit',
+      title: 'เงินฝากเข้าบัญชี',
+      desc: 'ส่งสลิปและยอดคงเหลือใหม่ทันทีที่ฝากเงินสำเร็จ',
+      icon: ArrowDownLeft,
+      iconCls: 'bg-emerald-100 text-emerald-700',
+      tone: 'bg-emerald-500',
+    },
+    {
+      key: 'notifyOnWithdraw',
+      title: 'ถอนเงินโอนออก',
+      desc: 'แจ้งเตือนความปลอดภัยทันทีเมื่อมีการตัดยอดออกจากบัญชี',
+      icon: ArrowUpRight,
+      iconCls: 'bg-rose-100 text-rose-700',
+      tone: 'bg-rose-500',
+    },
+    {
+      key: 'notifyOnInterest',
+      title: 'สรุปดอกเบี้ยสะสม',
+      desc: 'รายงานผลตอบแทนดอกเบี้ยเงินฝากประจำงวด',
+      icon: Sparkles,
+      iconCls: 'bg-amber-100 text-amber-700',
+      tone: 'bg-amber-500',
+    },
+  ];
+
   return (
-    <div className="max-w-2xl mx-auto my-4 space-y-5">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 text-white p-5 sm:p-6 rounded-3xl shadow-sm relative overflow-hidden">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-emerald-300 shadow-inner">
-              {settings.enableLinePush ? (
-                <BellRing className="w-6 h-6 text-white animate-bounce" />
-              ) : (
-                <BellOff className="w-6 h-6 text-slate-300" />
-              )}
+    <div className="max-w-2xl mx-auto my-2 sm:my-4 space-y-4">
+      {/* Hero with master switch */}
+      <div
+        className={`relative overflow-hidden rounded-[2rem] text-white p-5 shadow-xl transition-colors ${
+          settings.enableLinePush
+            ? 'bg-gradient-to-br from-[#06C755] via-emerald-600 to-teal-800 shadow-emerald-900/20'
+            : 'bg-gradient-to-br from-slate-600 to-slate-800 shadow-slate-900/20'
+        }`}
+      >
+        <div className="absolute -top-14 -right-8 w-48 h-48 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+        <div className="relative flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/20 flex items-center justify-center shrink-0">
+            {settings.enableLinePush ? <BellRing className="w-6 h-6" /> : <BellOff className="w-6 h-6" />}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg font-bold leading-tight">แจ้งเตือนผ่าน LINE</h2>
+            <p className="text-xs text-white/85">
+              {settings.enableLinePush ? 'เปิดอยู่ • รับข้อความเมื่อยอดเงินเปลี่ยน' : 'ปิดอยู่ • จะไม่มีข้อความเข้า LINE'}
+            </p>
+          </div>
+          <Toggle
+            checked={settings.enableLinePush}
+            onChange={handleToggleMaster}
+            tone="bg-white/40"
+            label="เปิดหรือปิดการแจ้งเตือนผ่าน LINE"
+          />
+        </div>
+      </div>
+
+      {settings.enableLinePush ? (
+        <div className="space-y-4 animate-in fade-in duration-200">
+          {/* Types */}
+          <section className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Sliders className="w-4 h-4 text-emerald-600" /> ประเภทที่ต้องการรับแจ้งเตือน
+            </h3>
+            <div className="divide-y divide-slate-100">
+              {options.map(({ key, title, desc, icon: Icon, iconCls, tone }) => (
+                <div
+                  key={key}
+                  onClick={() => handleToggleOption(key)}
+                  className="flex items-center gap-3 py-3 cursor-pointer"
+                >
+                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${iconCls}`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold text-slate-900">{title}</div>
+                    <div className="text-[11px] text-slate-500 leading-snug">{desc}</div>
+                  </div>
+                  <Toggle checked={settings[key]} onChange={() => handleToggleOption(key)} tone={tone} label={title} />
+                </div>
+              ))}
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold">
-                  การแจ้งเตือนผ่าน LINE Messaging API
-                </h2>
-                <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                    settings.enableLinePush
-                      ? 'bg-emerald-400 text-slate-900'
-                      : 'bg-slate-700 text-slate-300'
+          </section>
+
+          {/* Threshold */}
+          <section className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-emerald-600" /> ยอดเงินขั้นต่ำที่แจ้งเตือน
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {thresholds.map((t) => (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => handleThresholdChange(t.value)}
+                  className={`py-2.5 px-3 rounded-2xl text-xs font-semibold border transition-all active:scale-95 cursor-pointer ${
+                    settings.minimumAmount === t.value
+                      ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm'
+                      : 'bg-white border-slate-200 text-slate-700 hover:border-emerald-400'
                   }`}
                 >
-                  {settings.enableLinePush ? 'เปิดใช้งาน (Active)' : 'ปิดการแจ้งเตือน (Muted)'}
-                </span>
-              </div>
-              <p className="text-xs text-emerald-100/90 mt-0.5">
-                รับข้อความ Push Notification ทันทีที่มีการเปลี่ยนแปลงยอดเงินในบัญชี
-              </p>
+                  {t.label}
+                </button>
+              ))}
             </div>
-          </div>
-        </div>
-      </div>
+            <p className="text-[11px] text-slate-400">
+              {settings.minimumAmount === 0
+                ? 'แจ้งเตือนทุกครั้งที่มีธุรกรรมเกิดขึ้น'
+                : `แจ้งเตือนเฉพาะรายการตั้งแต่ ฿${settings.minimumAmount.toLocaleString()} ขึ้นไป`}
+            </p>
+          </section>
 
-      {/* Main Settings Card */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-2xs space-y-6">
-        {/* Master Switch */}
-        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 flex items-center justify-between gap-4">
-          <div className="space-y-0.5">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-slate-900">
-                เปิดรับการแจ้งเตือนยอดเงินผ่าน LINE (Push Notifications)
+          {/* LINE account */}
+          <section className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-4">
+            <div className="flex items-center gap-3">
+              {liffProfile?.pictureUrl ? (
+                <img src={liffProfile.pictureUrl} alt="" className="w-11 h-11 rounded-full object-cover ring-2 ring-[#06C755]/40 shrink-0" />
+              ) : (
+                <div className="w-11 h-11 rounded-full bg-[#06C755] text-white flex items-center justify-center shrink-0">
+                  <Smartphone className="w-5 h-5" />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-slate-900 truncate">
+                  {liffProfile ? liffProfile.displayName : 'บัญชี LINE ของคุณ'}
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  {lineLinked ? 'ผูกกับบัญชีสมาชิกแล้ว' : 'ยังไม่ได้ผูกบัญชี LINE — เข้าสู่ระบบผ่านแอป LINE เพื่อรับแจ้งเตือน'}
+                </div>
+              </div>
+              <span
+                className={`text-[10px] font-semibold px-2 py-1 rounded-full shrink-0 ${
+                  lineLinked ? 'bg-[#06C755]/15 text-[#05963f]' : 'bg-amber-100 text-amber-800'
+                }`}
+              >
+                {lineLinked ? 'เชื่อมต่อแล้ว' : 'ยังไม่เชื่อมต่อ'}
               </span>
             </div>
-            <p className="text-xs text-slate-500">
-              ส่งข้อความ Flex Messages แจ้งเตือนเข้าแชท LINE ส่วนตัวเมื่อเงินเข้า-ออก
-            </p>
-          </div>
 
-          <label className="relative inline-flex items-center cursor-pointer shrink-0">
-            <input
-              type="checkbox"
-              checked={settings.enableLinePush}
-              onChange={handleToggleMaster}
-              className="sr-only peer"
-            />
-            <div className="w-12 h-6.5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#06C755]"></div>
-          </label>
-        </div>
-
-        {/* Detailed Options when Master is ON */}
-        {settings.enableLinePush ? (
-          <div className="space-y-5 animate-in fade-in duration-200">
-            {/* Sub Notification Items */}
-            <div className="space-y-3">
-              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <Sliders className="w-4 h-4 text-emerald-600" />
-                เลือกประเภทธุรกรรมที่ต้องการรับแจ้งเตือน
-              </h3>
-
-              <div className="space-y-2.5">
-                {/* 1. Deposit Alert */}
-                <div
-                  onClick={() => handleToggleOption('notifyOnDeposit')}
-                  className="p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all flex items-center justify-between cursor-pointer group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                      <ArrowDownLeft className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-slate-900 block group-hover:text-emerald-800">
-                        แจ้งเตือนเมื่อมีเงินฝากเข้าบัญชี (Deposit Alerts)
-                      </span>
-                      <span className="text-[11px] text-slate-500">
-                        ส่งสลิปพร้อมยอดเงินคงเหลือใหม่ทันทีที่มีการฝากเงินสำเร็จ
-                      </span>
-                    </div>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={settings.notifyOnDeposit}
-                    onChange={() => {}}
-                    className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none"
-                  />
-                </div>
-
-                {/* 2. Withdraw Alert */}
-                <div
-                  onClick={() => handleToggleOption('notifyOnWithdraw')}
-                  className="p-3.5 rounded-2xl border border-slate-200 hover:border-rose-300 hover:bg-rose-50/20 transition-all flex items-center justify-between cursor-pointer group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
-                      <ArrowUpRight className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-slate-900 block group-hover:text-rose-800">
-                        แจ้งเตือนเมื่อมีการถอนเงินโอนออก (Withdrawal Alerts)
-                      </span>
-                      <span className="text-[11px] text-slate-500">
-                        แจ้งเตือนความปลอดภัยทันทีเมื่อมีการตัดยอดเงินออกจากบัญชี
-                      </span>
-                    </div>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={settings.notifyOnWithdraw}
-                    onChange={() => {}}
-                    className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 pointer-events-none"
-                  />
-                </div>
-
-                {/* 3. Interest Alert */}
-                <div
-                  onClick={() => handleToggleOption('notifyOnInterest')}
-                  className="p-3.5 rounded-2xl border border-slate-200 hover:border-amber-300 hover:bg-amber-50/20 transition-all flex items-center justify-between cursor-pointer group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-slate-900 block group-hover:text-amber-800">
-                        แจ้งเตือนสรุปดอกเบี้ยสะสมและเงินปันผล (Interest Alerts)
-                      </span>
-                      <span className="text-[11px] text-slate-500">
-                        รับรายงานผลตอบแทนดอกเบี้ยเงินฝากประจำงวด
-                      </span>
-                    </div>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={settings.notifyOnInterest}
-                    onChange={() => {}}
-                    className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 pointer-events-none"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Threshold Selector */}
-            <div className="space-y-2 pt-2 border-t border-slate-100">
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                <DollarSign className="w-4 h-4 text-emerald-600" />
-                กำหนดยอดเงินขั้นต่ำที่ต้องการให้แจ้งเตือน
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {thresholds.map((t) => (
-                  <button
-                    key={t.value}
-                    type="button"
-                    onClick={() => handleThresholdChange(t.value)}
-                    className={`py-2 px-3 rounded-xl text-xs font-medium transition-all ${
-                      settings.minimumAmount === t.value
-                        ? 'bg-slate-900 text-white font-semibold shadow-xs'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-              <p className="text-[11px] text-slate-400">
-                {settings.minimumAmount === 0
-                  ? 'ระบบจะส่งข้อความแจ้งเตือนทุกครั้งที่มีธุรกรรมเกิดขึ้น'
-                  : `ระบบจะแจ้งเตือนเฉพาะรายการที่มีมูลค่าตั้งแต่ ฿${settings.minimumAmount.toLocaleString()} ขึ้นไป`}
-              </p>
-            </div>
-
-            {/* LINE Account Link & Test Push */}
-            <div className="p-4 rounded-2xl bg-[#06C755]/10 border border-[#06C755]/30 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-[#06C755] text-white flex items-center justify-center font-bold">
-                    <Smartphone className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900">
-                      บัญชี LINE ที่เชื่อมต่อสำหรับส่ง Push Notification
-                    </h4>
-                    <p className="text-[11px] text-slate-500">
-                      {liffProfile
-                        ? `เชื่อมต่อกับ LINE: ${liffProfile.displayName}`
-                        : `LINE User ID: ${settings.lineUserId || currentMember.lineUserId || 'U1a2b3c4d5e6f7g8'}`}
-                    </p>
-                  </div>
-                </div>
-
-                <span className="text-[10px] bg-[#06C755] text-white font-semibold px-2 py-0.5 rounded-full">
-                  เชื่อมต่อแล้ว
-                </span>
-              </div>
-
-              <div className="pt-2 border-t border-[#06C755]/20 flex items-center justify-between">
-                <span className="text-[11px] text-slate-600">
-                  ต้องการตรวจสอบว่าการแจ้งเตือนทำงานได้ถูกต้องหรือไม่?
-                </span>
-                <button
-                  type="button"
-                  onClick={handleTriggerTest}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#06C755] hover:bg-[#05b34c] active:scale-95 text-white rounded-xl text-xs font-semibold transition-all shadow-xs"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>{testSent ? 'ส่งตัวอย่างแล้ว!' : 'ทดสอบส่งข้อความเข้า LINE'}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* Muted State Information */
-          <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2 text-xs text-slate-500">
-            <BellOff className="w-8 h-8 text-slate-400 mx-auto" />
-            <h4 className="font-bold text-slate-700">คุณปิดการรับการแจ้งเตือนผ่าน LINE ไว้</h4>
-            <p className="text-[11px] text-slate-400 max-w-md mx-auto">
-              เมื่อทำรายการฝากหรือถอนเงิน ระบบจะไม่ส่งข้อความแจ้งเตือนอัตโนมัติเข้าแชท LINE ของคุณ โดยคุณยังสามารถตรวจสอบประวัติธุรกรรมได้ในแท็บประวัติบนหน้าเว็บ
-            </p>
             <button
               type="button"
-              onClick={handleToggleMaster}
-              className="mt-2 inline-flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 transition-colors cursor-pointer"
+              onClick={handleTriggerTest}
+              className="w-full inline-flex items-center justify-center gap-2 py-3 bg-[#06C755] hover:bg-[#05b34c] active:scale-[0.99] text-white rounded-2xl text-sm font-bold transition-all shadow-lg shadow-[#06C755]/25 cursor-pointer"
             >
-              <Bell className="w-3.5 h-3.5" />
-              <span>เปิดการแจ้งเตือนอีกครั้ง</span>
+              <Send className="w-4 h-4" />
+              <span>{testSent ? 'เปิดตัวอย่างแล้ว!' : 'ดูตัวอย่างข้อความแจ้งเตือน'}</span>
             </button>
+          </section>
+        </div>
+      ) : (
+        <div className="bg-white border border-dashed border-slate-300 rounded-3xl p-6 text-center space-y-2">
+          <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 mx-auto flex items-center justify-center">
+            <BellOff className="w-6 h-6" />
           </div>
-        )}
+          <h4 className="text-sm font-bold text-slate-800">คุณปิดการแจ้งเตือนผ่าน LINE ไว้</h4>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            เมื่อฝากหรือถอนเงิน ระบบจะไม่ส่งข้อความเข้าแชท LINE ของคุณ ยังตรวจสอบรายการได้ที่หน้าประวัติธุรกรรม
+          </p>
+          <button
+            type="button"
+            onClick={handleToggleMaster}
+            className="mt-1 inline-flex items-center gap-1.5 px-5 py-2.5 bg-emerald-600 text-white rounded-2xl text-xs font-semibold hover:bg-emerald-700 transition-colors cursor-pointer"
+          >
+            <Bell className="w-3.5 h-3.5" />
+            <span>เปิดการแจ้งเตือนอีกครั้ง</span>
+          </button>
+        </div>
+      )}
 
-        {/* Saved Feedback */}
-        {saveSuccess && (
-          <div className="p-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center gap-1.5 animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>บันทึกการตั้งค่าการแจ้งเตือน LINE สำเร็จแล้ว!</span>
+      {/* Saved toast */}
+      {saveSuccess && (
+        <div className="fixed bottom-24 md:bottom-6 inset-x-0 z-[70] flex justify-center px-4 pointer-events-none animate-in fade-in slide-in-from-bottom-2">
+          <div className="bg-slate-900 text-white text-xs px-4 py-2.5 rounded-full shadow-xl flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <span>บันทึกการตั้งค่าแล้ว</span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
