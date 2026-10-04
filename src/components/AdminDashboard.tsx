@@ -1265,7 +1265,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               <button
                 type="button"
                 onClick={() => setInspectingTxn(null)}
-                className="p-1 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200"
+                className="p-1 rounded-2xl text-slate-400 hover:text-slate-700 hover:bg-slate-200"
               >
                 ✕
               </button>
@@ -1330,7 +1330,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div className="space-y-3 pt-2 border-t border-slate-100">
                   <h5 className="font-bold text-slate-800 text-xs">ลายเซ็นอิเล็กทรอนิกส์ 2 จุด</h5>
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="border border-slate-200 rounded-xl p-2 bg-slate-50 text-center">
+                    <div className="border border-slate-200 rounded-2xl p-2 bg-slate-50 text-center">
                       <p className="text-[10px] text-slate-500 mb-1">ลายเซ็นเจ้าของบัญชี</p>
                       {inspectingTxn.ownerSignature ? (
                         <RemoteImg
@@ -1342,7 +1342,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <p className="text-rose-500 py-3">ยังไม่มีลายเซ็น</p>
                       )}
                     </div>
-                    <div className="border border-slate-200 rounded-xl p-2 bg-slate-50 text-center">
+                    <div className="border border-slate-200 rounded-2xl p-2 bg-slate-50 text-center">
                       <p className="text-[10px] text-slate-500 mb-1">ลายเซ็นผู้รับเงิน</p>
                       {inspectingTxn.recipientSignature ? (
                         <RemoteImg
@@ -1362,19 +1362,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <h5 className="font-semibold text-slate-700 text-xs">เอกสารแนบประกอบการถอน (3 รายการ)</h5>
                       <div className="grid grid-cols-3 gap-2">
                         {inspectingTxn.attachments.idCard && (
-                          <div className="border border-slate-200 rounded-xl p-1 text-center bg-slate-50">
+                          <div className="border border-slate-200 rounded-2xl p-1 text-center bg-slate-50">
                             <span className="text-[10px] text-slate-500 block truncate">1. สำเนาบัตร</span>
                             <RemoteImg src={inspectingTxn.attachments.idCard.dataUrl} fileId={inspectingTxn.attachments.idCard.fileId} alt="บัตร" className="h-14 w-full object-cover rounded mt-1" />
                           </div>
                         )}
                         {inspectingTxn.attachments.sourcePassbook && (
-                          <div className="border border-slate-200 rounded-xl p-1 text-center bg-slate-50">
+                          <div className="border border-slate-200 rounded-2xl p-1 text-center bg-slate-50">
                             <span className="text-[10px] text-slate-500 block truncate">2. สมุดต้นทาง</span>
                             <RemoteImg src={inspectingTxn.attachments.sourcePassbook.dataUrl} fileId={inspectingTxn.attachments.sourcePassbook.fileId} alt="สมุด" className="h-14 w-full object-cover rounded mt-1" />
                           </div>
                         )}
                         {inspectingTxn.attachments.destinationPassbook && (
-                          <div className="border border-slate-200 rounded-xl p-1 text-center bg-slate-50">
+                          <div className="border border-slate-200 rounded-2xl p-1 text-center bg-slate-50">
                             <span className="text-[10px] text-slate-500 block truncate">3. สมุดปลายทาง</span>
                             <RemoteImg src={inspectingTxn.attachments.destinationPassbook.dataUrl} fileId={inspectingTxn.attachments.destinationPassbook.fileId} alt="สมุดปลายทาง" className="h-14 w-full object-cover rounded mt-1" />
                           </div>
@@ -1387,7 +1387,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
               {/* Rejection input box */}
               {showRejectBox && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl space-y-2">
+                <div className="p-3 bg-rose-50 border border-rose-200 rounded-2xl space-y-2">
                   <label className="text-[11px] font-bold text-rose-900 block">
                     ระบุเหตุผลในการปฏิเสธรายการ:
                   </label>
@@ -1396,7 +1396,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     placeholder="เช่น สลิปไม่ชัดเจน, ยอดเงินไม่ตรงกับบัญชี, ลายเซ็นไม่สมบูรณ์"
                     value={rejectReasonInput}
                     onChange={(e) => setRejectReasonInput(e.target.value)}
-                    className="w-full text-xs px-3 py-2 bg-white border border-rose-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500"
+                    className="w-full text-xs px-3 py-2 bg-white border border-rose-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-rose-500"
                   />
                   <div className="flex justify-end gap-2">
                     <button
@@ -1428,7 +1428,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   setShowRejectBox(false);
                   onOpenFlexModal(t);
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#06C755] bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#06C755] bg-emerald-50 hover:bg-emerald-100 rounded-2xl transition-colors"
               >
                 <MessageSquare className="w-3.5 h-3.5" />
                 <span>ดู LINE Flex Bubble</span>
@@ -1444,7 +1444,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       setShowRejectBox(false);
                       setPrintingWithdrawSlipTxn(t);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-2xl transition-colors cursor-pointer"
                     title="พิมพ์ใบถอนเงินออนไลน์ตามแบบฟอร์มทางการ"
                   >
                     <Printer className="w-3.5 h-3.5 text-indigo-600" />
@@ -1456,7 +1456,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowRejectBox(true)}
-                    className="px-3.5 py-2 border border-rose-200 text-rose-700 hover:bg-rose-50 rounded-xl text-xs font-semibold transition-colors"
+                    className="px-3.5 py-2 border border-rose-200 text-rose-700 hover:bg-rose-50 rounded-2xl text-xs font-semibold transition-colors"
                   >
                     ปฏิเสธรายการ
                   </button>
@@ -1465,7 +1465,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <button
                   type="button"
                   onClick={() => handleApproveTxn(inspectingTxn)}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5"
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>อนุมัติรายการ (Approve)</span>
@@ -1504,7 +1504,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   placeholder="เช่น 129 หรือ 00129"
                   value={newMemberId}
                   onChange={(e) => setNewMemberId(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -1518,7 +1518,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   placeholder="เช่น 1100200345670"
                   value={newCitizenId}
                   onChange={(e) => setNewCitizenId(e.target.value.replace(/\D/g, '').slice(0, 13))}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl font-mono focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -1530,7 +1530,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   placeholder="เช่น นายเอกชัย เจริญยิ่ง"
                   value={newFullName}
                   onChange={(e) => setNewFullName(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -1542,26 +1542,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   placeholder="เช่น 089-999-8888"
                   value={newPhone}
                   onChange={(e) => setNewPhone(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
 
               {addMemberError && (
-                <div className="p-2 bg-rose-50 text-rose-700 rounded-xl text-xs">{addMemberError}</div>
+                <div className="p-2 bg-rose-50 text-rose-700 rounded-2xl text-xs">{addMemberError}</div>
               )}
 
               <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setShowAddMemberModal(false)}
-                  className="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl"
+                  className="px-4 py-2 border border-slate-200 text-slate-600 rounded-2xl"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold shadow-xs"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-semibold shadow-xs"
                 >
                   บันทึกข้อมูลสมาชิก
                 </button>
@@ -1595,7 +1595,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <select
                   value={selectedMemberForAccount}
                   onChange={(e) => setSelectedMemberForAccount(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 >
                   {members.map((m) => (
                     <option key={m.memberId} value={m.memberId}>
@@ -1610,7 +1610,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <select
                   value={newAccountType}
                   onChange={(e) => setNewAccountType(e.target.value as AccountType)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 >
                   <option value="ออมทรัพย์">ออมทรัพย์ทั่วไป (ดอกเบี้ย 1.75% ต่อปี)</option>
                   <option value="ออมทรัพย์พิเศษ">ออมทรัพย์พิเศษ (ดอกเบี้ย 2.75% ต่อปี)</option>
@@ -1625,7 +1625,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   step="100"
                   value={newInitialDeposit}
                   onChange={(e) => setNewInitialDeposit(e.target.value)}
-                  className="w-full px-3 py-2 font-mono font-bold bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full px-3 py-2 font-mono font-bold bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   required
                 />
               </div>
@@ -1634,13 +1634,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowAddAccountModal(false)}
-                  className="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl"
+                  className="px-4 py-2 border border-slate-200 text-slate-600 rounded-2xl"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold shadow-xs"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-semibold shadow-xs"
                 >
                   สร้างบัญชีเงินฝาก
                 </button>

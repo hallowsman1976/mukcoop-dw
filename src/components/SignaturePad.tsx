@@ -115,7 +115,7 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
   };
 
   return (
-    <div className="border border-slate-200 rounded-xl p-3 bg-white shadow-xs">
+    <div className="border border-slate-200 rounded-2xl p-3.5 bg-white shadow-2xs">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1.5">
           <PenTool className="w-4 h-4 text-emerald-600" />
@@ -135,14 +135,14 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
           <button
             type="button"
             onClick={clearCanvas}
-            className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-rose-600 px-2 py-0.5 rounded hover:bg-slate-100 transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-rose-600 px-2.5 py-1 rounded-full border border-slate-200 hover:bg-rose-50 transition-colors"
           >
             <Eraser className="w-3 h-3" /> ล้าง
           </button>
         </div>
       </div>
 
-      <div className="relative border-2 border-dashed border-slate-200 rounded-lg overflow-hidden bg-slate-50/50 hover:bg-white transition-colors">
+      <div className="relative border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50 hover:bg-white transition-colors">
         <canvas
           ref={canvasRef}
           onMouseDown={startDrawing}
@@ -152,7 +152,7 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({
           onTouchStart={startDrawing}
           onTouchMove={draw}
           onTouchEnd={endDrawing}
-          className="w-full h-28 touch-none cursor-crosshair block"
+          className="w-full h-32 touch-none cursor-crosshair block"
         />
         {!hasDrawn && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-slate-300 text-xs select-none">

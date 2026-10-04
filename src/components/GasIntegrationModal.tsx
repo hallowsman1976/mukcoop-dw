@@ -49,7 +49,7 @@ export const GasIntegrationModal: React.FC<GasIntegrationModalProps> = ({ onClos
       >
         <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center">
               <Cloud className="w-5 h-5" />
             </div>
             <div>
@@ -60,7 +60,7 @@ export const GasIntegrationModal: React.FC<GasIntegrationModalProps> = ({ onClos
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200"
+            className="p-1.5 rounded-2xl text-slate-400 hover:text-slate-700 hover:bg-slate-200"
           >
             <X className="w-5 h-5" />
           </button>
@@ -78,20 +78,20 @@ export const GasIntegrationModal: React.FC<GasIntegrationModalProps> = ({ onClos
                 placeholder="https://script.google.com/macros/s/AKfycb.../exec"
                 value={webAppUrl}
                 onChange={(e) => setWebAppUrl(e.target.value)}
-                className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="flex-1 px-3 py-2 text-xs font-mono bg-white border border-blue-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
               />
               <button
                 type="button"
                 onClick={handleSaveAndTest}
                 disabled={testing}
-                className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-medium shrink-0 disabled:opacity-50"
+                className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-xs font-medium shrink-0 disabled:opacity-50"
               >
                 {testing ? 'กำลังทดสอบ...' : 'ทดสอบและบันทึก'}
               </button>
             </div>
             {result && (
               <div
-                className={`p-2.5 rounded-xl border flex items-start gap-2 ${
+                className={`p-2.5 rounded-2xl border flex items-start gap-2 ${
                   result.ok
                     ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
                     : 'bg-rose-50 border-rose-200 text-rose-800'
@@ -138,7 +138,7 @@ export const GasIntegrationModal: React.FC<GasIntegrationModalProps> = ({ onClos
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-semibold"
+            className="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-2xl text-xs font-semibold"
           >
             ปิด
           </button>

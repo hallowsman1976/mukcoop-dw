@@ -183,7 +183,7 @@ export const FlexMessageModal: React.FC<FlexMessageModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors"
+            className="p-1 rounded-2xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -288,7 +288,7 @@ export const FlexMessageModal: React.FC<FlexMessageModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowOfficialWithdrawSlip(true)}
-                  className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-semibold rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-semibold rounded-2xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>พิมพ์ใบถอนเงินออนไลน์ตามแบบฟอร์มทางการ</span>
@@ -303,7 +303,7 @@ export const FlexMessageModal: React.FC<FlexMessageModalProps> = ({
           <button
             type="button"
             onClick={handleCopyJson}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-2xl border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
           >
             {copied ? (
               <>
@@ -322,7 +322,7 @@ export const FlexMessageModal: React.FC<FlexMessageModalProps> = ({
             type="button"
             onClick={handleSendViaLiff}
             disabled={isSending}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-semibold shadow-xs transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-2xl bg-[#06C755] hover:bg-[#05b34c] text-white text-xs font-semibold shadow-xs transition-colors"
           >
             <Send className="w-3.5 h-3.5" />
             <span>{sendSuccess ? 'ส่งเข้า LINE สำเร็จ ✅' : 'ส่งข้อความเข้า LINE (LIFF)'}</span>

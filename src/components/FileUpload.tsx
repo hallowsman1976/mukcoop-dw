@@ -96,12 +96,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       />
 
       {value ? (
-        <div className="relative group border border-slate-200 rounded-xl p-2.5 bg-slate-50/70 hover:bg-white flex items-center justify-between gap-3 transition-colors">
+        <div className="relative group border border-slate-200 rounded-2xl p-3 bg-slate-50/70 hover:bg-white flex items-center justify-between gap-3 transition-colors">
           <div className="flex items-center gap-2.5 min-w-0">
             {value.type.startsWith('image/') ? (
               <div
                 onClick={() => setShowPreviewModal(true)}
-                className="w-11 h-11 rounded-lg overflow-hidden bg-slate-200 shrink-0 cursor-pointer border border-slate-200 hover:opacity-90 relative"
+                className="w-12 h-12 rounded-xl overflow-hidden bg-slate-200 shrink-0 cursor-pointer border border-slate-200 hover:opacity-90 relative"
               >
                 <img
                   src={value.dataUrl}
@@ -113,7 +113,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
                 <FileText className="w-5 h-5" />
               </div>
             )}
@@ -152,10 +152,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           onClick={() => inputRef.current?.click()}
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
-          className="border-2 border-dashed border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/20 rounded-xl p-3.5 text-center cursor-pointer transition-all group"
+          className="border-2 border-dashed border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/30 rounded-2xl p-4 text-center cursor-pointer transition-all group"
         >
           <div className="flex flex-col items-center justify-center gap-1">
-            <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-emerald-100 text-slate-500 group-hover:text-emerald-600 flex items-center justify-center transition-colors">
+            <div className="w-10 h-10 rounded-full bg-slate-100 group-hover:bg-emerald-100 text-slate-500 group-hover:text-emerald-600 flex items-center justify-center transition-colors">
               <Upload className="w-4 h-4" />
             </div>
             <p className="text-xs font-medium text-slate-700 group-hover:text-emerald-700">
@@ -176,11 +176,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       {/* Image Preview Modal */}
       {showPreviewModal && value?.dataUrl && (
         <div
-          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4"
+          className="fixed inset-0 z-[70] bg-black/75 backdrop-blur-xs flex items-end sm:items-center justify-center sm:p-4"
           onClick={() => setShowPreviewModal(false)}
         >
           <div
-            className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150"
+            className="bg-white rounded-t-3xl sm:rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl animate-in slide-in-from-bottom-6 sm:zoom-in-95 fade-in duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-3.5 border-b border-slate-100">

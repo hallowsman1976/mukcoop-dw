@@ -59,7 +59,7 @@ export const LiffConfigModal: React.FC<LiffConfigModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200"
+            className="p-1 rounded-2xl text-slate-400 hover:text-slate-700 hover:bg-slate-200"
           >
             <X className="w-5 h-5" />
           </button>
@@ -105,7 +105,7 @@ export const LiffConfigModal: React.FC<LiffConfigModalProps> = ({
               placeholder="เช่น 2006789123-abcdefgh"
               value={liffIdInput}
               onChange={(e) => setLiffIdInput(e.target.value)}
-              className="w-full px-3 py-2 text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#06C755] focus:bg-white"
+              className="w-full px-3 py-2 text-xs font-mono bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#06C755] focus:bg-white"
             />
             <p className="text-[11px] text-slate-400">
               รับ LIFF ID ได้จาก{' '}
@@ -121,7 +121,7 @@ export const LiffConfigModal: React.FC<LiffConfigModalProps> = ({
           </div>
 
           {/* Quick Notice */}
-          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-[11px] space-y-1">
+          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 text-[11px] space-y-1">
             <p className="font-semibold">💡 โหมดจำลองทำงานสมบูรณ์แบบ 100%:</p>
             <p className="text-emerald-700">
               แม้ไม่มี LIFF ID ระบบก็เปิดให้ทดสอบการยืนยันตัวตน 5 หลัก, ฟอร์มฝาก-ถอน, ลายเซ็น 2 จุด, ตรวจสอบสลิป, ตารางบัญชี และ LINE Flex Bubble ได้เสมือนจริงทุกฟังก์ชัน
@@ -142,14 +142,14 @@ export const LiffConfigModal: React.FC<LiffConfigModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-1.5 border border-slate-200 rounded-xl text-xs text-slate-600 hover:bg-slate-100"
+              className="px-3 py-1.5 border border-slate-200 rounded-2xl text-xs text-slate-600 hover:bg-slate-100"
             >
               ปิด
             </button>
             <button
               type="button"
               onClick={handleSave}
-              className="px-4 py-1.5 bg-[#06C755] hover:bg-[#05b34c] text-white font-semibold rounded-xl text-xs transition-colors flex items-center gap-1"
+              className="px-4 py-1.5 bg-[#06C755] hover:bg-[#05b34c] text-white font-semibold rounded-2xl text-xs transition-colors flex items-center gap-1"
             >
               {saved ? (
                 <>

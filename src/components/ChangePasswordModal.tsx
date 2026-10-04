@@ -32,9 +32,9 @@ export const ChangePasswordModal: React.FC<Props> = ({ onDone }) => {
 
   return (
     <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-4">
-      <form onSubmit={submit} className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-3">
+      <form onSubmit={submit} className="bg-white rounded-[2rem] max-w-sm w-full p-6 shadow-2xl space-y-3.5">
         <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center">
+          <div className="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center">
             <KeyRound className="w-5 h-5" />
           </div>
           <div>
@@ -48,7 +48,7 @@ export const ChangePasswordModal: React.FC<Props> = ({ onDone }) => {
           placeholder="รหัสผ่านเริ่มต้น"
           value={oldPw}
           onChange={(e) => setOldPw(e.target.value)}
-          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm"
+          className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
         />
         <input
           type="password"
@@ -56,7 +56,7 @@ export const ChangePasswordModal: React.FC<Props> = ({ onDone }) => {
           placeholder="รหัสผ่านใหม่ (อย่างน้อย 10 ตัวอักษร)"
           value={newPw}
           onChange={(e) => setNewPw(e.target.value)}
-          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm"
+          className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
         />
         <input
           type="password"
@@ -64,13 +64,13 @@ export const ChangePasswordModal: React.FC<Props> = ({ onDone }) => {
           placeholder="ยืนยันรหัสผ่านใหม่"
           value={confirmPw}
           onChange={(e) => setConfirmPw(e.target.value)}
-          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm"
+          className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
         />
         {error && <p className="text-xs text-rose-600">{error}</p>}
         <button
           type="submit"
           disabled={busy}
-          className="w-full bg-slate-900 text-white rounded-xl py-2.5 text-sm font-semibold disabled:opacity-50"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl py-3 text-sm font-bold shadow-lg shadow-indigo-600/25 disabled:opacity-50 cursor-pointer"
         >
           {busy ? 'กำลังบันทึก...' : 'บันทึกรหัสผ่านใหม่'}
         </button>
