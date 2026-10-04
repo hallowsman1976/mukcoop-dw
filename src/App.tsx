@@ -286,11 +286,9 @@ export default function App() {
                 <div className="animate-in fade-in duration-150">
                   <Dashboard
                     currentMember={currentMember}
-                    accounts={accounts}
+                    liffProfile={liffStatus.profile}
                     transactions={transactions}
                     onNavigateTab={setActiveTab}
-                    onQuickAction={handleSelectAccountAction}
-                    onOpenFlexModal={(txn) => setFlexModalTxn(txn)}
                   />
                 </div>
               )}
