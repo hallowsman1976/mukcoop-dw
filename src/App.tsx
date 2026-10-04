@@ -365,36 +365,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 px-4 text-center text-xs text-slate-400">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-slate-600 font-medium">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>ระบบฝาก-ถอนเงินออนไลน์ผ่าน LINE LIFF (React 18 + Google Apps Script V8 + Google Sheets)</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setShowGasModal(true)}
-              className="text-slate-500 hover:text-blue-600 underline flex items-center gap-1"
-            >
-              <FileSpreadsheet className="w-3.5 h-3.5" />
-              <span>คู่มือ Google Sheets / Apps Script (Code.gs)</span>
-            </button>
-            <span>•</span>
-            <button
-              type="button"
-              onClick={() => setShowLiffModal(true)}
-              className="text-slate-500 hover:text-[#06C755] underline flex items-center gap-1"
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>ตั้งค่า LINE LIFF</span>
-            </button>
-          </div>
-        </div>
-      </footer>
-
       {/* Modals */}
       {flexModalTxn && (
         <FlexMessageModal
