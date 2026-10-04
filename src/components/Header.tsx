@@ -59,8 +59,8 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
       {/* Top micro bar: LINE LIFF & Google Apps Script status badges */}
       <div className="bg-slate-900 text-slate-300 px-4 py-1.5 text-[11px] flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
+        <div className="hidden sm:flex items-center gap-3 min-w-0">
+          <span className="flex items-center gap-1.5 text-emerald-400 font-medium whitespace-nowrap">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
             LINE LIFF Online Banking Gateway v2.1
           </span>
@@ -70,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-end">
           {/* LIFF Badge */}
           <button
             type="button"
@@ -83,7 +83,8 @@ export const Header: React.FC<HeaderProps> = ({
             title="ตั้งค่า LINE LIFF SDK"
           >
             <Smartphone className="w-3 h-3" />
-            <span>LINE LIFF: {liffConnected ? 'เชื่อมต่อแล้ว' : 'Sandbox'}</span>
+            <span className="hidden sm:inline whitespace-nowrap">LINE LIFF: {liffConnected ? 'เชื่อมต่อแล้ว' : 'Sandbox'}</span>
+            <span className="sm:hidden">LIFF</span>
           </button>
 
           {/* GAS Badge */}
@@ -98,7 +99,8 @@ export const Header: React.FC<HeaderProps> = ({
             title="ดูสคริปต์ Google Apps Script (Code.gs) & ตั้งค่า Web App"
           >
             <Cloud className="w-3 h-3" />
-            <span>GAS Backend: {gasConnected ? 'Google Sheets Sync' : 'Code.gs API'}</span>
+            <span className="hidden sm:inline whitespace-nowrap">GAS Backend: {gasConnected ? 'Google Sheets Sync' : 'ยังไม่ได้เชื่อมต่อ'}</span>
+            <span className="sm:hidden">{gasConnected ? 'GAS ✓' : 'GAS'}</span>
           </button>
 
           {/* Portal Switcher Badge */}
@@ -110,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({
               title="เข้าสู่ระบบเจ้าหน้าที่ / ผู้ดูแลระบบ"
             >
               <ShieldAlert className="w-3 h-3" />
-              <span>ระบบเจ้าหน้าที่ (Admin)</span>
+              <span className="whitespace-nowrap">เจ้าหน้าที่ (Admin)</span>
             </button>
           ) : (
             <button
@@ -120,7 +122,7 @@ export const Header: React.FC<HeaderProps> = ({
               title="สลับไปยังหน้าพอร์ทัลสมาชิก"
             >
               <Users className="w-3 h-3" />
-              <span>พอร์ทัลสมาชิก (Member)</span>
+              <span className="whitespace-nowrap">พอร์ทัลสมาชิก</span>
             </button>
           )}
         </div>
