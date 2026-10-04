@@ -1,0 +1,4 @@
+test/**
+package.json
+node_modules/**
+*.local.*
