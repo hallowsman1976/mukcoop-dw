@@ -1,3 +1,5 @@
+import { COOP_NAME } from '../constants/brand';
+import { BrandLogo } from './BrandLogo';
 import React, { useRef } from 'react';
 import { TransactionRecord } from '../types';
 import { formatCurrency, thaiBahtText } from '../utils/thaiBahtText';
@@ -92,16 +94,12 @@ export const OfficialWithdrawalSlipModal: React.FC<OfficialWithdrawalSlipModalPr
             {/* Header: Logo and Title */}
             <div className="flex items-center gap-4 mb-4">
               <div className="w-16 h-16 shrink-0 flex items-center justify-center">
-                <img
-                  src="https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=120&q=80"
-                  alt="Coop Emblem Logo"
-                  className="w-16 h-16 rounded-full object-contain border border-emerald-600/40 p-0.5"
-                />
+                <BrandLogo logoUrl={settings.logoUrl} className="w-16 h-16 border border-emerald-600/40 p-0.5" />
               </div>
 
               <div className="flex-1">
                 <h1 className="text-lg sm:text-xl font-bold tracking-tight text-slate-950 flex flex-wrap items-baseline gap-2">
-                  <span>สหกรณ์ออมทรัพย์สาธารณสุขจังหวัดมุกดาหาร จำกัด</span>
+                  <span>{settings.cooperativeName || COOP_NAME}</span>
                   <span className="text-lg sm:text-xl font-bold text-slate-900">ใบถอนเงินออนไลน์</span>
                 </h1>
                 <div className="text-[11px] text-slate-500 font-mono">

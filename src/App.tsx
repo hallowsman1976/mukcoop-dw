@@ -67,7 +67,13 @@ export default function App() {
 
   const [mustChangePassword, setMustChangePassword] = useState(false);
 
+  const [brand, setBrand] = useState({ logoUrl: '', coopName: '' });
+
   const syncFromCache = () => {
+    setBrand({
+      logoUrl: StorageService.getSystemSettings().logoUrl,
+      coopName: StorageService.getSystemSettings().cooperativeName,
+    });
     setAccounts(StorageService.getAccounts());
     setTransactions(StorageService.getTransactions());
     setCurrentMember(StorageService.getCurrentUser());
@@ -216,6 +222,8 @@ export default function App() {
         onToggleViewMode={(mode) => setViewMode(mode)}
         liffConnected={liffStatus.isInClient || !!liffStatus.liffId}
         gasConnected={apiConnected}
+        logoUrl={brand.logoUrl}
+        coopName={brand.coopName}
       />
 
       {/* Main Content Area */}
@@ -252,6 +260,8 @@ export default function App() {
               <LoginForm
                 onLoginSuccess={handleLoginSuccess}
                 liffProfile={liffStatus.profile}
+                logoUrl={brand.logoUrl}
+                coopName={brand.coopName}
                 onOpenLiffConfig={() => setShowLiffModal(true)}
               />
 

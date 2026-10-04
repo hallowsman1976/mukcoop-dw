@@ -8,7 +8,7 @@
  */
 
 const DEFAULT_SETTINGS = {
-  cooperativeName: 'สหกรณ์ออมทรัพย์เพื่อการพัฒนา จำกัด',
+  cooperativeName: 'สหกรณ์ออมทรัพย์สาธารณสุขจังหวัดมุกดาหาร จำกัด',
   registrationNumber: '',
   contactPhone: '',
   contactEmail: '',

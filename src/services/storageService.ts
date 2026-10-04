@@ -23,7 +23,7 @@ const LOANS_KEY = 'line_liff_loans_v1';
 const ADMIN_PROFILE_KEY = 'coop_admin_profile_v1';
 
 export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
-  cooperativeName: 'สหกรณ์ออมทรัพย์เพื่อการพัฒนา จำกัด',
+  cooperativeName: 'สหกรณ์ออมทรัพย์สาธารณสุขจังหวัดมุกดาหาร จำกัด',
   registrationNumber: '',
   contactPhone: '',
   contactEmail: '',

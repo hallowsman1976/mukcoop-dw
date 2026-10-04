@@ -1,8 +1,9 @@
+import { SYSTEM_NAME, COOP_NAME } from '../constants/brand';
+import { BrandLogo } from './BrandLogo';
 import React from 'react';
 import { Member, BankAccount, AdminUser } from '../types';
 import { formatCurrency } from '../utils/thaiBahtText';
 import {
-  ShieldCheck,
   ShieldAlert,
   User,
   LogOut,
@@ -33,6 +34,8 @@ interface HeaderProps {
   onToggleViewMode: (mode: 'member' | 'admin') => void;
   liffConnected: boolean;
   gasConnected: boolean;
+  logoUrl?: string;
+  coopName?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -48,6 +51,8 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleViewMode,
   liffConnected,
   gasConnected,
+  logoUrl,
+  coopName,
 }) => {
   // Compute total balance for this member
   const memberAccounts = currentMember
@@ -132,20 +137,18 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
         {/* Brand */}
         <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-600/20">
-            <ShieldCheck className="w-6 h-6" />
-          </div>
+          <BrandLogo logoUrl={logoUrl} className="w-10 h-10 shrink-0 shadow-md shadow-emerald-600/20" />
           <div>
             <div className="flex items-center gap-1.5">
               <h1 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
-                สหกรณ์ออมทรัพย์ออนไลน์
+                {SYSTEM_NAME}
               </h1>
               <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-1.5 py-0.2 rounded">
                 LINE LIFF
               </span>
             </div>
             <p className="text-[11px] text-slate-500 hidden sm:block">
-              ระบบฝาก-ถอนเงินดิจิทัล ตรวจสอบสลิปและบันทึกอัตโนมัติ
+              {coopName || COOP_NAME}
             </p>
           </div>
         </div>

@@ -1,20 +1,26 @@
+import { SYSTEM_NAME, COOP_NAME } from '../constants/brand';
+import { BrandLogo } from './BrandLogo';
 import React, { useState } from 'react';
 import { Member, LiffUserProfile } from '../types';
 import { padMemberId, formatCitizenId } from '../utils/validators';
 import { StorageService } from '../services/storageService';
 import { LiffService } from '../services/liffService';
-import { ShieldCheck, UserCheck, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { UserCheck, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface LoginFormProps {
   onLoginSuccess: (member: Member) => void;
   liffProfile: LiffUserProfile | null;
   onOpenLiffConfig: () => void;
+  logoUrl?: string;
+  coopName?: string;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({
   onLoginSuccess,
   liffProfile,
   onOpenLiffConfig,
+  logoUrl,
+  coopName,
 }) => {
   const [memberIdInput, setMemberIdInput] = useState('');
   const [citizenIdInput, setCitizenIdInput] = useState('');
@@ -80,14 +86,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     <div className="max-w-md mx-auto my-6 px-4">
       {/* LINE LIFF Header Banner */}
       <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-lg shadow-emerald-500/20 mb-3">
-          <ShieldCheck className="w-8 h-8" />
-        </div>
-        <h2 className="text-xl font-bold text-slate-800 tracking-tight">
-          ระบบฝาก-ถอนเงินออนไลน์ผ่าน LINE LIFF
-        </h2>
+        <BrandLogo logoUrl={logoUrl} className="w-16 h-16 mx-auto shadow-lg shadow-emerald-500/20 mb-3" />
+        <h2 className="text-xl font-bold text-slate-800 tracking-tight">{SYSTEM_NAME}</h2>
+        <p className="text-sm font-semibold text-emerald-700 mt-0.5">{coopName || COOP_NAME}</p>
         <p className="text-xs text-slate-500 mt-1">
-          ยืนยันตัวตนสมาชิกสหกรณ์ออมทรัพย์ / กองทุนการเงิน ปลอดภัย รวดเร็ว
+          ยืนยันตัวตนสมาชิก ปลอดภัย รวดเร็ว
         </p>
       </div>
 
