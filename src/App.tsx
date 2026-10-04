@@ -194,7 +194,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 flex flex-col font-['Prompt',sans-serif] text-slate-800">
       {/* Toast Notification */}
       {notification && (
-        <div className="fixed top-14 right-4 z-50 animate-in slide-in-from-top-3 fade-in duration-200">
+        <div className="fixed top-20 right-4 z-[70] animate-in slide-in-from-top-3 fade-in duration-200">
           <div className="bg-slate-900 text-white text-xs px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2 border border-slate-700">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>{notification.message}</span>

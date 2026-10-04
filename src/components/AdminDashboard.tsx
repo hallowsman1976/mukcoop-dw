@@ -1385,7 +1385,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
               <button
                 type="button"
-                onClick={() => onOpenFlexModal(inspectingTxn)}
+                onClick={() => {
+                  const t = inspectingTxn;
+                  setInspectingTxn(null);
+                  setShowRejectBox(false);
+                  onOpenFlexModal(t);
+                }}
                 className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#06C755] bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors"
               >
                 <MessageSquare className="w-3.5 h-3.5" />
@@ -1396,7 +1401,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 {inspectingTxn.type === 'withdraw' && (
                   <button
                     type="button"
-                    onClick={() => setPrintingWithdrawSlipTxn(inspectingTxn)}
+                    onClick={() => {
+                      const t = inspectingTxn;
+                      setInspectingTxn(null);
+                      setShowRejectBox(false);
+                      setPrintingWithdrawSlipTxn(t);
+                    }}
                     className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors cursor-pointer"
                     title="พิมพ์ใบถอนเงินออนไลน์ตามแบบฟอร์มทางการ"
                   >

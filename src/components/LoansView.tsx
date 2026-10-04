@@ -725,7 +725,10 @@ export const LoansView: React.FC<LoansViewProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      if (onOpenFlexModal) onOpenFlexModal(paymentReceipt.txn);
+                      if (!onOpenFlexModal) return;
+                      const txn = paymentReceipt.txn;
+                      setPaymentReceipt(null);
+                      onOpenFlexModal(txn);
                     }}
                     className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
                   >

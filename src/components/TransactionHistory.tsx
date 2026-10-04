@@ -454,7 +454,9 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  onOpenFlexModal(selectedTxn);
+                  const t = selectedTxn;
+                  setSelectedTxn(null);
+                  onOpenFlexModal(t);
                 }}
                 className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#06C755] hover:bg-[#05b34c] text-white rounded-xl text-xs font-medium transition-colors"
               >
@@ -466,7 +468,11 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                 {selectedTxn.type === 'withdraw' && (
                   <button
                     type="button"
-                    onClick={() => setPrintingWithdrawSlipTxn(selectedTxn)}
+                    onClick={() => {
+                      const t = selectedTxn;
+                      setSelectedTxn(null);
+                      setPrintingWithdrawSlipTxn(t);
+                    }}
                     className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer"
                     title="พิมพ์ใบถอนเงินออนไลน์ตามแบบฟอร์มทางการ"
                   >

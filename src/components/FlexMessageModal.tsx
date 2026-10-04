@@ -158,7 +158,7 @@ export const FlexMessageModal: React.FC<FlexMessageModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+      className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div
