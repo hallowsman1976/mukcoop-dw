@@ -8,6 +8,7 @@ import { Member, BankAccount, TransactionRecord, AdminUser } from './types';
 import { StorageService } from './services/storageService';
 import { ApiService } from './services/api';
 import { ChangePasswordModal } from './components/ChangePasswordModal';
+import { SplashScreen } from './components/SplashScreen';
 import { LiffService, LiffStatus } from './services/liffService';
 import { Header } from './components/Header';
 import { LoginForm } from './components/LoginForm';
@@ -117,6 +118,7 @@ export default function App() {
 
   useEffect(() => {
     (async () => {
+      const bootStart = Date.now();
       await StorageService.loadPublicSettings();
       const status = await LiffService.init(StorageService.getLiffId());
       setLiffStatus(status);
@@ -138,6 +140,8 @@ export default function App() {
         }
       }
       syncFromCache();
+      const remaining = 450 - (Date.now() - bootStart);
+      if (remaining > 0) await new Promise((r) => setTimeout(r, remaining));
       setBooting(false);
     })();
   }, []);
@@ -232,6 +236,8 @@ export default function App() {
 
   const apiConnected = ApiService.isConfigured();
 
+  if (booting) return <SplashScreen />;
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-['Prompt',sans-serif] text-slate-800">
       {/* Toast Notification */}
@@ -290,11 +296,7 @@ export default function App() {
           )
         ) : (
           // Member View: Member Login or Member Dashboard / Features
-          !currentMember && booting ? (
-            <div className="flex items-center justify-center py-24">
-              <span className="w-8 h-8 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></span>
-            </div>
-          ) : !currentMember ? (
+          !currentMember ? (
             // Login / Identity Verification View
             <div className="space-y-6">
               <LoginForm
