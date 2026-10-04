@@ -99,7 +99,7 @@ export default function App() {
   useEffect(() => {
     (async () => {
       await StorageService.loadPublicSettings();
-      const status = await LiffService.init();
+      const status = await LiffService.init(StorageService.getLiffId());
       setLiffStatus(status);
       if (await StorageService.restoreMemberSession()) {
         setViewMode('member');
