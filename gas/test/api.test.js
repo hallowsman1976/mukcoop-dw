@@ -87,12 +87,24 @@ test('member login without LINE is refused unless sandbox flag is on', () => {
   assert.strictEqual(env.call('memberLogin', { memberId: '128', citizenId: '1101700230678' }).code, 'LINE_REQUIRED');
 });
 
+test('LINE binding requires PDPA consent', () => {
+  const { env } = boot();
+  env.props.LINE_LOGIN_CHANNEL_ID = 'chan';
+  env.lineVerify = (p) => ({ sub: p.id_token });
+  const r = env.call('memberLogin', { memberId: '405', citizenId: '3100100456786', idToken: 'Unew' });
+  assert.strictEqual(r.code, 'CONSENT_REQUIRED');
+  assert.ok(!env.read('Members').find((m) => m.memberId === '00405').lineUserId);
+});
+
 test('LINE binding: first login binds, other LINE account is refused', () => {
   const { env } = boot();
   env.props.LINE_LOGIN_CHANNEL_ID = 'chan';
   env.lineVerify = (p) => ({ sub: p.id_token });
-  const first = env.call('memberLogin', { memberId: '405', citizenId: '3100100456786', idToken: 'Unew' });
+  const first = env.call('memberLogin', { memberId: '405', citizenId: '3100100456786', idToken: 'Unew', pdpaConsent: true, pdpaVersion: '1.0' });
   assert.strictEqual(first.data.newlyLinked, true);
+  const row = env.read('Members').find((m) => m.memberId === '00405');
+  assert.ok(row.pdpaConsentAt);
+  assert.strictEqual(row.pdpaVersion, '1.0');
   const again = env.call('memberLogin', { memberId: '405', citizenId: '3100100456786', idToken: 'Unew' });
   assert.strictEqual(again.data.newlyLinked, false);
   assert.strictEqual(env.read('Members').find((m) => m.memberId === '00405').lineUserId, 'Unew');

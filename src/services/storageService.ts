@@ -157,8 +157,19 @@ export const StorageService = {
   },
 
   // ---------------------------------------------------------------- member session
-  async loginMember(memberId: string, citizenId: string, idToken?: string): Promise<Member> {
-    const r = await ApiService.call<{ token: string; member: Member; newlyLinked?: boolean }>('memberLogin', { memberId, citizenId, idToken });
+  async loginMember(
+    memberId: string,
+    citizenId: string,
+    idToken?: string,
+    pdpa?: { consent: boolean; version: string }
+  ): Promise<Member> {
+    const r = await ApiService.call<{ token: string; member: Member; newlyLinked?: boolean }>('memberLogin', {
+      memberId,
+      citizenId,
+      idToken,
+      pdpaConsent: !!pdpa?.consent,
+      pdpaVersion: pdpa?.version,
+    });
     ApiService.setToken('member', r.token);
     cache.currentMember = r.member;
     await this.refreshMember();

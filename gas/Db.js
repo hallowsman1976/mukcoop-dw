@@ -3,7 +3,7 @@
 const SPREADSHEET_ID = '1QMBLGXKGtVBbMkRiaQ0xn2YYcYxZLJAu3Og2G9Ph1S4';
 
 const SCHEMA = {
-  Members: ['memberId', 'citizenId', 'fullName', 'contact', 'phone', 'lineUserId', 'registeredDate', 'notificationSettings'],
+  Members: ['memberId', 'citizenId', 'fullName', 'contact', 'phone', 'lineUserId', 'registeredDate', 'notificationSettings', 'pdpaConsentAt', 'pdpaVersion'],
   Accounts: ['accountNo', 'memberId', 'citizenId', 'accountName', 'accountType', 'balance', 'accruedInterest', 'contact', 'interestRate', 'lastUpdated'],
   Transactions: [
     'id', 'refCode', 'type', 'accountNo', 'accountName', 'accountType', 'memberId', 'citizenId',

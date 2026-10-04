@@ -164,6 +164,10 @@ function memberLogin_(p) {
       recordFail_(key);
       throw new ApiError('LINE_MISMATCH', 'บัญชีสมาชิกนี้ผูกกับบัญชี LINE อื่นแล้ว กรุณาติดต่อเจ้าหน้าที่');
     }
+    if (!member.lineUserId && p.pdpaConsent !== true) {
+      // Linking stores the LINE user id: PDPA consent is required first.
+      throw new ApiError('CONSENT_REQUIRED', 'กรุณายอมรับนโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA) ก่อนผูกบัญชี LINE');
+    }
     if (!member.lineUserId) {
       const lock = LockService.getScriptLock();
       lock.waitLock(20000);
@@ -174,6 +178,8 @@ function memberLogin_(p) {
         }
         const upd = stripRow_(fresh);
         upd.lineUserId = lineUserId;
+        upd.pdpaConsentAt = bangkokParts(new Date()).stamp;
+        upd.pdpaVersion = String(p.pdpaVersion || '').slice(0, 20);
         writeRow_('Members', fresh.__row, upd);
         member.lineUserId = lineUserId;
         newlyLinked = true;

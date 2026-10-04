@@ -5,6 +5,7 @@ import { Member, LiffUserProfile } from '../types';
 import { padMemberId, formatCitizenId } from '../utils/validators';
 import { StorageService } from '../services/storageService';
 import { LiffService, LiffStatus } from '../services/liffService';
+import { PdpaConsent, PDPA_VERSION } from './PdpaConsent';
 import { UserCheck, AlertCircle, CheckCircle2, UserPlus, Smartphone } from 'lucide-react';
 
 interface LoginFormProps {
@@ -31,6 +32,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paddedNotice, setPaddedNotice] = useState<string | null>(null);
+  const [pdpaAccepted, setPdpaAccepted] = useState(false);
 
   // Auto-pad member ID when user finishes typing or blurs
   const handleMemberIdBlur = () => {
@@ -75,9 +77,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       return;
     }
 
+    if (!pdpaAccepted) {
+      setError('กรุณาอ่านและยอมรับนโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA) ก่อนเข้าสู่ระบบ');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const member = await StorageService.loginMember(paddedId, cleanedCitizenId, LiffService.getIdToken());
+      const member = await StorageService.loginMember(paddedId, cleanedCitizenId, LiffService.getIdToken(), {
+        consent: pdpaAccepted,
+        version: PDPA_VERSION,
+      });
       onLoginSuccess(member);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'เข้าสู่ระบบไม่สำเร็จ');
@@ -263,6 +273,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             )}
           </div>
 
+          <PdpaConsent checked={pdpaAccepted} onChange={(v) => { setPdpaAccepted(v); setError(null); }} />
+
           {/* Error notice */}
           {error && (
             <div className="flex items-start gap-2 p-3 bg-rose-50 border border-rose-100 rounded-xl text-xs text-rose-700">
@@ -274,7 +286,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !pdpaAccepted}
             className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-sm rounded-2xl shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {isSubmitting ? (
