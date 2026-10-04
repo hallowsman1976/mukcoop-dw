@@ -258,7 +258,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setAddMemberError(null);
 
     const padded = padMemberId(newMemberId);
-    const cleanedCitizen = newCitizenId.replace(/D/g, '');
+    const cleanedCitizen = newCitizenId.replace(/\D/g, '');
 
     if (padded.length !== 5) {
       setAddMemberError('รหัสสมาชิกต้องมี 5 หลัก');
