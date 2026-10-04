@@ -140,8 +140,28 @@ export default function App() {
             const member = await StorageService.loginMemberByLine(idToken);
             setViewMode('member');
             showNotification(`ยินดีต้อนรับคุณ ${member.fullName} (รหัสสมาชิก ${member.memberId})`);
-          } catch {
+          } catch (e) {
             // not linked yet (or LINE token rejected): fall back to the normal login form
+            const code = (e as { code?: string }).code;
+            console.warn('LINE auto sign-in failed:', code, e);
+            if (code && code !== 'NOT_LINKED') {
+              showNotification(e instanceof Error ? e.message : 'เข้าสู่ระบบอัตโนมัติไม่สำเร็จ', 'info');
+            }
+          }
+        } else if (LiffService.status.isLoggedIn) {
+          // Logged in to LINE but no usable ID token (expired, or the LIFF app lacks the openid scope).
+          // Re-login once to refresh it; the flag stops a redirect loop if the token is never issued.
+          console.warn('LINE auto sign-in skipped: no valid LIFF ID token');
+          let retried = false;
+          try {
+            retried = sessionStorage.getItem('coop_liff_relogin_v1') === '1';
+            sessionStorage.setItem('coop_liff_relogin_v1', '1');
+          } catch {
+            retried = true;
+          }
+          if (!retried) {
+            LiffService.login();
+            return;
           }
         }
       }

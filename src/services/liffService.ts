@@ -80,7 +80,16 @@ export const LiffService = {
   /** LIFF ID token (JWT) the backend verifies with LINE. Undefined outside LINE / when not logged in. */
   getIdToken(): string | undefined {
     if (window.liff && this.status.liffId && this.status.isLoggedIn) {
-      return window.liff.getIDToken() || undefined;
+      const token = window.liff.getIDToken();
+      if (!token) return undefined;
+      // LIFF caches the ID token (valid ~1 hour); an expired one is rejected by LINE and breaks auto sign-in.
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+        if (typeof payload.exp === 'number' && payload.exp * 1000 < Date.now() + 30000) return undefined;
+      } catch {
+        // undecodable: let the server decide
+      }
+      return token;
     }
     return undefined;
   },
