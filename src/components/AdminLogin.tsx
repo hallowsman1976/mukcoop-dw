@@ -2,22 +2,29 @@ import React, { useState } from 'react';
 import { AdminUser } from '../types';
 import { StorageService } from '../services/storageService';
 import {
-  ShieldAlert,
+  ShieldCheck,
   Lock,
   User,
   Eye,
   EyeOff,
   LogIn,
   AlertCircle,
-  Building2,
   ArrowLeft,
-  CheckCircle2,
+  FileCheck2,
+  Users,
+  Settings,
 } from 'lucide-react';
 
 interface AdminLoginProps {
   onLoginSuccess: (admin: AdminUser, mustChangePassword: boolean) => void;
   onBackToMemberLogin: () => void;
 }
+
+const FEATURES = [
+  { icon: FileCheck2, label: 'ตรวจสลิปและอนุมัติธุรกรรม' },
+  { icon: Users, label: 'จัดการสมาชิกและบัญชีเงินฝาก' },
+  { icon: Settings, label: 'ตั้งค่านโยบายและรายงาน' },
+];
 
 export const AdminLogin: React.FC<AdminLoginProps> = ({
   onLoginSuccess,
@@ -43,82 +50,90 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({
     }
   };
 
+  const inputCls =
+    'w-full pl-11 pr-4 py-3.5 text-sm bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-900 transition-all';
+
   return (
-    <div className="max-w-md mx-auto my-6 px-4">
-      {/* Return to member button */}
+    <div className="max-w-md mx-auto my-4 sm:my-8 px-1 sm:px-4">
       <button
         type="button"
         onClick={onBackToMemberLogin}
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 mb-4 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 mb-3 transition-colors cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4" />
-        <span>กลับไปยังหน้าสมาชิกสหกรณ์</span>
+        <span>กลับไปยังหน้าสมาชิก</span>
       </button>
 
-      {/* Header Banner */}
-      <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-blue-900 text-white shadow-xl shadow-indigo-900/25 mb-3">
-          <ShieldAlert className="w-7 h-7 text-white" />
-        </div>
-        <div className="inline-block bg-indigo-100 text-indigo-900 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1.5 border border-indigo-200">
-          Cooperative Officer & Management Portal
-        </div>
-        <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-          ระบบจัดการสหกรณ์สำหรับเจ้าหน้าที่ (Admin)
-        </h2>
-        <p className="text-xs text-slate-500 mt-1">
-          ตรวจสอบสลิปเงินฝาก อนุมัติการถอนเงิน และจัดการสมุดบัญชีเงินฝาก
-        </p>
-      </div>
+      <div className="rounded-[2rem] overflow-hidden shadow-2xl shadow-indigo-950/15 border border-slate-200 bg-white">
+        {/* Hero */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-indigo-700 via-indigo-800 to-slate-900 text-white px-6 pt-8 pb-10">
+          <div className="absolute -top-16 -right-10 w-56 h-56 rounded-full bg-white/10 blur-3xl pointer-events-none"></div>
+          <div className="absolute -bottom-20 -left-10 w-56 h-56 rounded-full bg-blue-400/20 blur-3xl pointer-events-none"></div>
 
-      {/* Login Card */}
-      <div className="bg-white border border-slate-200 rounded-[2rem] p-6 shadow-xl shadow-slate-900/5">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Username */}
+          <div className="relative">
+            <div className="w-14 h-14 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center backdrop-blur-sm">
+              <ShieldCheck className="w-7 h-7" />
+            </div>
+            <p className="mt-4 text-[11px] font-semibold tracking-widest uppercase text-indigo-200">
+              Officer Portal
+            </p>
+            <h2 className="text-2xl font-bold tracking-tight mt-0.5">ระบบเจ้าหน้าที่สหกรณ์</h2>
+            <p className="text-xs text-indigo-100/80 mt-1">เข้าสู่ระบบเพื่อจัดการธุรกรรมและข้อมูลสมาชิก</p>
+
+            <ul className="mt-5 space-y-2">
+              {FEATURES.map(({ icon: Icon, label }) => (
+                <li key={label} className="flex items-center gap-2.5 text-xs text-indigo-50">
+                  <span className="w-7 h-7 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
+                    <Icon className="w-3.5 h-3.5" />
+                  </span>
+                  {label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Form (overlaps the hero) */}
+        <form onSubmit={handleSubmit} className="relative -mt-5 rounded-t-[2rem] bg-white px-6 pt-6 pb-6 space-y-4">
           <div>
-            <label className="text-xs font-semibold text-slate-700 block mb-1">
-              ชื่อผู้ใช้งานเจ้าหน้าที่ (Username / Employee ID) <span className="text-rose-500">*</span>
-            </label>
+            <label className="text-xs font-semibold text-slate-700 block mb-1.5">ชื่อผู้ใช้เจ้าหน้าที่</label>
             <div className="relative">
+              <User className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
-                placeholder="ชื่อผู้ใช้เจ้าหน้าที่"
+                autoComplete="username"
+                placeholder="Username"
                 value={username}
                 onChange={(e) => {
                   setUsername(e.target.value);
                   setError(null);
                 }}
-                className="w-full pl-10 pr-3.5 py-3 text-sm font-mono bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-900"
+                className={`${inputCls} font-mono`}
                 required
               />
-              <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
 
-          {/* Password */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-semibold text-slate-700">
-                รหัสผ่าน (Password) <span className="text-rose-500">*</span>
-              </label>
-            </div>
+            <label className="text-xs font-semibold text-slate-700 block mb-1.5">รหัสผ่าน</label>
             <div className="relative">
+              <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type={showPassword ? 'text' : 'password'}
-                placeholder="ระบุรหัสผ่านเข้าใช้งาน"
+                autoComplete="current-password"
+                placeholder="รหัสผ่าน"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
                   setError(null);
                 }}
-                className="w-full pl-10 pr-10 py-3 text-sm font-mono bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-900"
+                className={`${inputCls} pr-12 font-mono`}
                 required
               />
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1.5 cursor-pointer"
                 title={showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -126,15 +141,13 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({
             </div>
           </div>
 
-          {/* Error Notice */}
           {error && (
-            <div className="flex items-start gap-2 p-3 bg-rose-50 border border-rose-100 rounded-xl text-xs text-rose-700">
+            <div className="flex items-start gap-2 p-3 bg-rose-50 border border-rose-100 rounded-2xl text-xs text-rose-700">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" />
               <span>{error}</span>
             </div>
           )}
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={isSubmitting}
@@ -145,14 +158,14 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({
             ) : (
               <LogIn className="w-4 h-4" />
             )}
-            <span>เข้าสู่ระบบเจ้าหน้าที่ (Admin Login)</span>
+            <span>เข้าสู่ระบบเจ้าหน้าที่</span>
           </button>
-        </form>
 
-        <div className="mt-4 pt-3 border-t border-slate-100 text-center text-[11px] text-slate-400 flex items-center justify-center gap-1">
-          <Building2 className="w-3.5 h-3.5" />
-          <span>ระบบรักษาความปลอดภัยระดับองค์กรสหกรณ์ออมทรัพย์</span>
-        </div>
+          <p className="text-center text-[11px] text-slate-400 flex items-center justify-center gap-1">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            เฉพาะเจ้าหน้าที่ที่ได้รับอนุญาตเท่านั้น
+          </p>
+        </form>
       </div>
     </div>
   );
