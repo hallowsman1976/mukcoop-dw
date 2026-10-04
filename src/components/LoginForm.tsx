@@ -5,7 +5,7 @@ import { Member, LiffUserProfile } from '../types';
 import { padMemberId, formatCitizenId } from '../utils/validators';
 import { StorageService } from '../services/storageService';
 import { LiffService } from '../services/liffService';
-import { UserCheck, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { UserCheck, AlertCircle, CheckCircle2, UserPlus } from 'lucide-react';
 
 interface LoginFormProps {
   onLoginSuccess: (member: Member) => void;
@@ -13,6 +13,7 @@ interface LoginFormProps {
   onOpenLiffConfig: () => void;
   logoUrl?: string;
   coopName?: string;
+  lineOfficialId?: string;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({
@@ -21,6 +22,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onOpenLiffConfig,
   logoUrl,
   coopName,
+  lineOfficialId,
 }) => {
   const [memberIdInput, setMemberIdInput] = useState('');
   const [citizenIdInput, setCitizenIdInput] = useState('');
@@ -81,6 +83,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       setIsSubmitting(false);
     }
   };
+
+  // Add-friend link for the Official Account, e.g. @coop -> https://line.me/R/ti/p/%40coop
+  const oaId = (lineOfficialId || '').trim();
+  const addFriendUrl = oaId
+    ? `https://line.me/R/ti/p/${encodeURIComponent(oaId.startsWith('@') ? oaId : `@${oaId}`)}`
+    : null;
 
   return (
     <div className="max-w-md mx-auto my-6 px-4">
@@ -220,6 +228,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           </button>
         </form>
 
+        {addFriendUrl && (
+          <a
+            href={addFriendUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white text-sm font-semibold transition-colors"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>เพิ่มเพื่อน LINE {lineOfficialId?.trim()}</span>
+          </a>
+        )}
       </div>
     </div>
   );

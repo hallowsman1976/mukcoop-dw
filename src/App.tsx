@@ -67,12 +67,13 @@ export default function App() {
 
   const [mustChangePassword, setMustChangePassword] = useState(false);
 
-  const [brand, setBrand] = useState({ logoUrl: '', coopName: '' });
+  const [brand, setBrand] = useState({ logoUrl: '', coopName: '', lineOfficialId: '' });
 
   const syncFromCache = () => {
     setBrand({
       logoUrl: StorageService.getSystemSettings().logoUrl,
       coopName: StorageService.getSystemSettings().cooperativeName,
+      lineOfficialId: StorageService.getSystemSettings().lineOfficialId,
     });
     setAccounts(StorageService.getAccounts());
     setTransactions(StorageService.getTransactions());
