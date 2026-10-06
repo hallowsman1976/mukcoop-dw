@@ -55,8 +55,14 @@ const HANDLERS = {
     const s = requireMember_(token);
     return memberData_(s.memberId);
   },
-  submitDeposit: function (p, token) { return submitDeposit_(requireMember_(token), p); },
-  submitWithdraw: function (p, token) { return submitWithdraw_(requireMember_(token), p); },
+  submitDeposit: function (p, token) {
+    const s = requireMember_(token);
+    return once_(s, p, function () { return submitDeposit_(s, p); });
+  },
+  submitWithdraw: function (p, token) {
+    const s = requireMember_(token);
+    return once_(s, p, function () { return submitWithdraw_(s, p); });
+  },
   updateNotificationSettings: function (p, token) {
     const s = requireMember_(token);
     const ns = {
@@ -108,6 +114,37 @@ const HANDLERS = {
   changePassword: function (p, token) { return changeAdminPassword_(requireAdmin_(token), p); },
 };
 
+// ---------------------------------------------------------------- idempotency
+
+/**
+ * A submit carries a client-generated requestId. Replaying the same id (double tap, retry after a
+ * timeout) returns the transaction created the first time instead of creating another one.
+ * Callers already hold the script lock, so check-then-write cannot race.
+ */
+function once_(session, p, run) {
+  const rid = String(p.requestId || '');
+  if (!/^[A-Za-z0-9_-]{8,64}$/.test(rid)) return run();
+  const cache = CacheService.getScriptCache();
+  const key = 'idem:' + session.memberId + ':' + rid;
+  const prevId = cache.get(key);
+  if (prevId) {
+    const prev = readAll_('Transactions').filter(function (t) { return t.id === prevId; })[0];
+    if (prev) return { transaction: txnOutMember_(prev) };
+  }
+  const result = run();
+  if (result && result.transaction) cache.put(key, result.transaction.id, 21600);
+  return result;
+}
+
+/** SHA-256 of an uploaded file's bytes, to spot the same slip being submitted twice. */
+function fileHash_(att) {
+  const parsed = parseDataUrl(att && att.dataUrl);
+  if (!parsed.ok) return '';
+  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, Utilities.base64Decode(parsed.base64))
+    .map(function (b) { return ('0' + (b & 0xff).toString(16)).slice(-2); })
+    .join('');
+}
+
 // ---------------------------------------------------------------- reads
 
 function txnOut_(t) {
@@ -115,6 +152,17 @@ function txnOut_(t) {
   const files = o.files || {};
   delete o.files;
   o.fileIds = files; // {slip, ownerSignature, recipientSignature, idCard, sourcePassbook, destinationPassbook}
+  if (o.slipVerification) {
+    o.slipVerification = Object.assign({}, o.slipVerification);
+    delete o.slipVerification.slipHash;
+  }
+  return o;
+}
+
+/** Transaction as shown to its owner: citizen id masked down to the last 4 digits. */
+function txnOutMember_(t) {
+  const o = txnOut_(t);
+  o.citizenId = maskCitizenId_(o.citizenId);
   return o;
 }
 
@@ -124,9 +172,13 @@ function memberData_(memberId) {
   const now = bangkokParts(new Date());
   const txns = readAll_('Transactions').filter(function (t) { return t.memberId === memberId; });
   return {
-    member: publicMember_(member),
-    accounts: readAll_('Accounts').filter(function (a) { return a.memberId === memberId; }).map(stripRow_),
-    transactions: txns.map(txnOut_).reverse(),
+    member: memberSelf_(member),
+    accounts: readAll_('Accounts').filter(function (a) { return a.memberId === memberId; }).map(function (a) {
+      const o = stripRow_(a);
+      o.citizenId = maskCitizenId_(o.citizenId);
+      return o;
+    }),
+    transactions: txns.map(txnOutMember_).reverse(),
     dailyWithdrawnTotal: dailyWithdrawn_(txns, memberId, now.ymd),
     settings: getSettings_(),
   };
@@ -222,12 +274,19 @@ function submitDeposit_(session, p) {
   t.balanceAfter = account.balance; // unchanged until a teller approves
   t.status = 'pending';
   t.depositDateTime = String(p.depositDateTime || '').slice(0, 32);
-  t.slipVerification = { verified: false, message: 'รอเจ้าหน้าที่ตรวจสอบสลิป' };
+  const slipHash = fileHash_(p.slipImage);
+  if (slipHash) {
+    const dup = readAll_('Transactions').some(function (x) {
+      return x.type === 'deposit' && x.status !== 'rejected' && x.slipVerification && x.slipVerification.slipHash === slipHash;
+    });
+    if (dup) throw new ApiError('DUPLICATE_SLIP', 'สลิปนี้เคยถูกส่งเข้าระบบแล้ว กรุณาตรวจสอบประวัติรายการ');
+  }
+  t.slipVerification = { verified: false, message: 'รอเจ้าหน้าที่ตรวจสอบสลิป', slipHash: slipHash };
   t.note = String(p.note || '').slice(0, 500);
   t.files = { slip: saveUpload_(p.slipImage, 'Slip_' + t.refCode) };
   appendRow_('Transactions', t);
   notifyStaffPending_(settings, t);
-  return { transaction: txnOut_(t) };
+  return { transaction: txnOutMember_(t) };
 }
 
 function submitWithdraw_(session, p) {
@@ -290,7 +349,7 @@ function submitWithdraw_(session, p) {
     t.balanceAfter = Number(account.balance);
     appendRow_('Transactions', t);
     notifyStaffPending_(settings, t);
-    return { transaction: txnOut_(t) };
+    return { transaction: txnOutMember_(t) };
   }
 
   const after = applyToBalance('withdraw', Number(account.balance), amount, chk.totalDeduction);
@@ -306,7 +365,7 @@ function submitWithdraw_(session, p) {
   writeRow_('Accounts', account.__row, upd);
   appendRow_('Transactions', t);
   notifyMember_(settings, member, t);
-  return { transaction: txnOut_(t) };
+  return { transaction: txnOutMember_(t) };
 }
 
 function reviewTransaction_(admin, p) {

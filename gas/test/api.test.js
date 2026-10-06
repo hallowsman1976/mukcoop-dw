@@ -301,3 +301,52 @@ test('members can read only their own attachments', () => {
   const other = memberToken(env, '00405', '3100100456786');
   assert.strictEqual(env.call('getMyAttachment', { fileId }, other).code, 'FORBIDDEN');
 });
+
+test('replaying the same requestId returns the first transaction instead of a new one', () => {
+  const { env } = boot();
+  const t = memberToken(env);
+  const a = env.call('submitWithdraw', wd({ requestId: 'req-12345678' }), t);
+  const b = env.call('submitWithdraw', wd({ requestId: 'req-12345678' }), t);
+  assert.ok(a.ok && b.ok);
+  assert.strictEqual(a.data.transaction.id, b.data.transaction.id);
+  assert.strictEqual(env.read('Transactions').length, 1);
+  assert.strictEqual(env.read('Accounts')[0].balance, 99000);
+});
+
+test('the same slip cannot be submitted twice unless the first was rejected', () => {
+  const { env, adminPw } = boot();
+  const t = memberToken(env);
+  const dep = { accountNo: '101-2-00128-1', amount: 500, slipImage: att };
+  const first = env.call('submitDeposit', dep, t);
+  assert.ok(first.ok);
+  assert.strictEqual(env.call('submitDeposit', dep, t).code, 'DUPLICATE_SLIP');
+  assert.strictEqual(env.read('Transactions').length, 1);
+  assert.ok(env.call('reviewTransaction', { id: first.data.transaction.id, status: 'rejected' }, adminToken(env, adminPw)).ok);
+  assert.ok(env.call('submitDeposit', dep, t).ok);
+});
+
+test('the slip hash is never sent to clients', () => {
+  const { env, adminPw } = boot();
+  const t = memberToken(env);
+  const d = env.call('submitDeposit', { accountNo: '101-2-00128-1', amount: 500, slipImage: att }, t);
+  assert.ok(!('slipHash' in d.data.transaction.slipVerification));
+  const adm = env.call('adminGetData', {}, adminToken(env, adminPw)).data.transactions[0];
+  assert.ok(!('slipHash' in adm.slipVerification));
+});
+
+test('members never receive their LINE user id and see a masked citizen id; staff never get the LINE id', () => {
+  const { env, adminPw } = boot();
+  const login = env.call('memberLogin', { memberId: '128', citizenId: '1101700230678' });
+  assert.strictEqual(login.data.member.citizenId, 'XXXXXXXXX0678');
+  assert.ok(!('lineUserId' in login.data.member));
+  assert.strictEqual(login.data.member.lineLinked, true);
+  const d = env.call('getMyData', {}, login.data.token).data;
+  assert.strictEqual(d.member.citizenId, 'XXXXXXXXX0678');
+  assert.ok(d.accounts.every((a) => a.citizenId === 'XXXXXXXXX0678'));
+  const tx = env.call('submitWithdraw', wd(), login.data.token).data.transaction;
+  assert.strictEqual(tx.citizenId, 'XXXXXXXXX0678');
+  assert.ok(!JSON.stringify(d).includes('1101700230678'));
+  const adm = env.call('adminGetData', {}, adminToken(env, adminPw)).data;
+  assert.ok(adm.members.every((m) => !('lineUserId' in m)));
+  assert.ok(adm.members.some((m) => m.citizenId === '1101700230678')); // staff still need it for import / search
+});

@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import {
   Member,
   BankAccount,
   AttachedFile,
   TransactionRecord,
-  SlipVerificationResult,
 } from '../types';
 import { formatCurrency, thaiBahtText } from '../utils/thaiBahtText';
-import { formatAccountNo, formatThaiDateTime } from '../utils/validators';
+import { formatAccountNo, formatThaiDateTime, newRequestId } from '../utils/validators';
 import { StorageService } from '../services/storageService';
 import { FileUpload } from './FileUpload';
 import {
@@ -17,9 +16,7 @@ import {
   AlertCircle,
   Calendar,
   Clock,
-  ScanLine,
   Info,
-  ShieldAlert,
   Landmark,
   Copy,
 } from 'lucide-react';
@@ -69,11 +66,8 @@ export const DepositForm: React.FC<DepositFormProps> = ({
   // Slip upload
   const [slipFile, setSlipFile] = useState<AttachedFile | null>(null);
 
-  // Slip Verification API states
-  const [isVerifyingSlip, setIsVerifyingSlip] = useState<boolean>(false);
-  const [verificationResult, setVerificationResult] = useState<SlipVerificationResult | null>(
-    null
-  );
+  // One id per form: a retry or double tap of the same submit is recognised by the server.
+  const requestId = useRef<string>(newRequestId());
 
   const [note, setNote] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -89,61 +83,11 @@ export const DepositForm: React.FC<DepositFormProps> = ({
     const val = e.target.value.replace(/[^0-9.]/g, '');
     setAmountInput(val);
     setError(null);
-
-    // If verification already occurred and amount was changed, warn user
-    if (verificationResult && verificationResult.amount && parseFloat(val) !== verificationResult.amount) {
-      // Keep result but note discrepancy
-    }
   };
 
   const handleSelectQuickAmount = (amt: number) => {
     setAmountInput(String(amt));
     setError(null);
-  };
-
-  // API ตรวจสอบยอดเงินฝาก (Simulates SlipOK / EasySlip / GAS Slip Verification API)
-  const handleVerifySlipWithApi = () => {
-    if (!slipFile) {
-      setError('กรุณาแนบไฟล์ภาพสลิปเงินโอนก่อนทำการตรวจสอบ');
-      return;
-    }
-
-    setIsVerifyingSlip(true);
-    setError(null);
-
-    // Simulate API call to Slip Verification Backend
-    setTimeout(() => {
-      const parsedAmount = numericAmount > 0 ? numericAmount : 5000;
-      const refNumber = `01${Math.floor(1000000000000000 + Math.random() * 9000000000000000)}`;
-
-      // If user hadn't entered amount yet, autofill from slip OCR
-      if (!amountInput) {
-        setAmountInput(String(parsedAmount));
-      }
-
-      setVerificationResult({
-        verified: true,
-        bankName: 'ธนาคารกสิกรไทย (KBANK)',
-        transRef: refNumber,
-        amount: parsedAmount,
-        dateTime: `${depositDate} ${depositTime}:12`,
-        senderName: currentMember.fullName,
-        receiverName: 'สหกรณ์ออมทรัพย์ (บัญชีหลัก)',
-        receiverAccount: '11-XXXXX-0',
-        confidenceScore: 0.99,
-        message: 'ตรวจสอบผ่าน API สำเร็จ: สลิปถูกต้อง ไม่พบประวัติใช้งานซ้ำ ยอดเงินตรงกัน',
-      });
-
-      setIsVerifyingSlip(false);
-    }, 1000);
-  };
-
-  const handleSlipChange = (file: AttachedFile | null) => {
-    setSlipFile(file);
-    setVerificationResult(null);
-    if (file) {
-      // Auto-trigger verification suggestion
-    }
   };
 
   const setDateToNow = () => {
@@ -178,14 +122,6 @@ export const DepositForm: React.FC<DepositFormProps> = ({
       return;
     }
 
-    // ยอดฝาก-ถอน ต้องสัมพันธ์กัน Check
-    if (verificationResult && verificationResult.amount && Math.abs(numericAmount - verificationResult.amount) > 0.01) {
-      setError(
-        `ยอดเงินฝากที่กรอก (฿${formatCurrency(numericAmount)}) ไม่ตรงกับยอดเงินที่ตรวจพบบนสลิป (฿${formatCurrency(verificationResult.amount)}) กรุณาตรวจสอบยอดเงินให้ตรงกัน`
-      );
-      return;
-    }
-
     setIsSubmitting(true);
 
     void (async () => {
@@ -204,11 +140,7 @@ export const DepositForm: React.FC<DepositFormProps> = ({
         status: 'completed',
         depositDateTime: fullDepositDateTime,
         slipImage: slipFile,
-        slipVerification: verificationResult || {
-          verified: true,
-          amount: numericAmount,
-          message: 'บันทึกพร้อมสลิปแนบ',
-        },
+        requestId: requestId.current,
         note,
       });
 
@@ -450,81 +382,20 @@ export const DepositForm: React.FC<DepositFormProps> = ({
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
               {stepBadge(4)} แนบสลิปเงินโอน <span className="text-rose-500">*</span>
             </h3>
-            {slipFile && (
-              <button
-                type="button"
-                onClick={handleVerifySlipWithApi}
-                disabled={isVerifyingSlip}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-full text-xs font-medium transition-all disabled:opacity-50 cursor-pointer"
-              >
-                {isVerifyingSlip ? (
-                  <>
-                    <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    <span>กำลังตรวจสอบ...</span>
-                  </>
-                ) : (
-                  <>
-                    <ScanLine className="w-3.5 h-3.5" />
-                    <span>ตรวจสอบสลิป</span>
-                  </>
-                )}
-              </button>
-            )}
           </div>
 
           <FileUpload
             label="แนบสลิปเงินโอน"
             required
             value={slipFile}
-            onChange={handleSlipChange}
+            onChange={setSlipFile}
             helperText="ภาพสลิปจาก Mobile Banking (JPEG, PNG ไม่เกิน 5MB)"
           />
 
-          {verificationResult && (
-            <div className="p-3.5 rounded-2xl border border-teal-200 bg-teal-50/70 space-y-2 text-xs">
-              <div className="flex items-center gap-1.5 text-teal-800 font-semibold">
-                <CheckCircle2 className="w-4 h-4 text-teal-600" />
-                ผลการตรวจสอบสลิป
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-700 bg-white/80 p-2.5 rounded-xl border border-teal-100">
-                <div>
-                  <span className="text-slate-400 block">ธนาคารที่โอน</span>
-                  <span className="font-semibold text-slate-800">
-                    {verificationResult.bankName || 'ธนาคารกสิกรไทย'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">รหัสอ้างอิง</span>
-                  <span className="font-mono font-semibold text-slate-800 break-all">
-                    {verificationResult.transRef}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">ยอดเงินบนสลิป</span>
-                  <span className="font-mono font-bold text-teal-700">
-                    ฿{formatCurrency(verificationResult.amount || numericAmount)}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">วันเวลาบนสลิป</span>
-                  <span className="font-mono text-slate-700">{verificationResult.dateTime}</span>
-                </div>
-              </div>
-
-              {numericAmount > 0 &&
-                verificationResult.amount &&
-                Math.abs(numericAmount - verificationResult.amount) > 0.01 && (
-                  <div className="p-2 rounded-lg bg-rose-100/80 text-rose-800 flex items-start gap-1.5">
-                    <ShieldAlert className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
-                    <span>
-                      คำเตือน: ยอดเงินที่ระบุ (฿{formatCurrency(numericAmount)}) ไม่ตรงกับยอดบนสลิป
-                      (฿{formatCurrency(verificationResult.amount)})
-                    </span>
-                  </div>
-                )}
-            </div>
-          )}
+          <p className="text-[11px] text-slate-500 flex items-start gap-1.5">
+            <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+            <span>เจ้าหน้าที่จะตรวจสอบสลิปและปรับยอดเข้าบัญชีให้หลังอนุมัติ รายการจะแสดงสถานะ "รอตรวจสอบ" จนกว่าจะอนุมัติ</span>
+          </p>
 
           <input
             type="text"

@@ -191,7 +191,7 @@ function memberLogin_(p) {
 
   clearFails_(key);
   const token = createSession_({ role: 'member', memberId: memberId }, 6 * 3600);
-  return { token: token, member: publicMember_(member), newlyLinked: newlyLinked };
+  return { token: token, member: memberSelf_(member), newlyLinked: newlyLinked };
 }
 
 /**
@@ -205,11 +205,26 @@ function memberLoginByLine_(p) {
   if (matches.length !== 1) throw new ApiError('NOT_LINKED', 'ยังไม่ได้ผูกบัญชี LINE กับสมาชิก');
   const member = matches[0];
   const token = createSession_({ role: 'member', memberId: member.memberId }, 6 * 3600);
-  return { token: token, member: publicMember_(member) };
+  return { token: token, member: memberSelf_(member) };
 }
 
+/** Keep only the last 4 digits of a citizen id: "XXXXXXXXX5678". */
+function maskCitizenId_(id) {
+  const d = onlyDigits(id);
+  return d ? new Array(Math.max(d.length - 3, 1)).join('X') + d.slice(-4) : '';
+}
+
+/** Member row for staff screens. The LINE user id never leaves the server; clients only see lineLinked. */
 function publicMember_(m) {
   const out = stripRow_(m);
   out.lineLinked = !!m.lineUserId;
+  delete out.lineUserId;
+  return out;
+}
+
+/** Member row for the member's own screens: also masks the citizen id. */
+function memberSelf_(m) {
+  const out = publicMember_(m);
+  out.citizenId = maskCitizenId_(out.citizenId);
   return out;
 }

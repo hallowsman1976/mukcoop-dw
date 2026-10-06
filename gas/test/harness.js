@@ -79,7 +79,7 @@ function createEnv() {
     Utilities: {
       DigestAlgorithm: { SHA_256: 'sha256' },
       Charset: { UTF_8: 'utf8' },
-      computeDigest: (_a, s) => [...crypto.createHash('sha256').update(s).digest()].map((b) => (b > 127 ? b - 256 : b)),
+      computeDigest: (_a, s) => [...crypto.createHash('sha256').update(Array.isArray(s) ? Buffer.from(s.map((b) => b & 255)) : s).digest()].map((b) => (b > 127 ? b - 256 : b)),
       getUuid: () => crypto.randomUUID(),
       base64Decode: (s) => [...Buffer.from(s, 'base64')],
       base64Encode: (bytes) => Buffer.from(bytes).toString('base64'),

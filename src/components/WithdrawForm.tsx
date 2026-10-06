@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { Member, BankAccount, DigitalSignature, AttachedFile, TransactionRecord } from '../types';
 import { THAI_BANKS } from '../data/banks';
 import { formatCurrency, thaiBahtText } from '../utils/thaiBahtText';
-import { formatAccountNo } from '../utils/validators';
+import { formatAccountNo, newRequestId } from '../utils/validators';
 import { StorageService } from '../services/storageService';
 import { SignaturePad } from './SignaturePad';
 import { FileUpload } from './FileUpload';
@@ -64,6 +64,8 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
 
   // States
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  // One id per form: a retry or double tap of the same submit is recognised by the server.
+  const requestId = useRef<string>(newRequestId());
   const [error, setError] = useState<string | null>(null);
 
   // Business Rules Calculations
@@ -205,6 +207,7 @@ export const WithdrawForm: React.FC<WithdrawFormProps> = ({
       const now = new Date();
       const result = await StorageService.submitTransaction('withdraw', {
         type: 'withdraw',
+        requestId: requestId.current,
         accountNo: currentAccount.accountNo,
         accountName: currentAccount.accountName,
         accountType: currentAccount.accountType,
