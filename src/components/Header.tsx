@@ -76,9 +76,6 @@ export const Header: React.FC<HeaderProps> = ({
               <h1 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
                 {SYSTEM_NAME}
               </h1>
-              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-1.5 py-0.2 rounded">
-                LINE LIFF
-              </span>
             </div>
             <p className="text-[11px] text-slate-500 hidden sm:block">
               {coopName || COOP_NAME}

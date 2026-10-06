@@ -302,16 +302,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               <span>เพิ่มเพื่อน LINE {lineOfficialId?.trim()}</span>
             </a>
           )}
-
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={onOpenLiffConfig}
-              className="text-[11px] text-slate-400 hover:text-emerald-700 hover:underline cursor-pointer"
-            >
-              ตั้งค่า LIFF
-            </button>
-          </div>
         </div>
       </div>
     </div>
