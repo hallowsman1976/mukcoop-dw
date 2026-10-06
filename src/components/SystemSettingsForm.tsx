@@ -290,6 +290,36 @@ export const SystemSettingsForm: React.FC<SystemSettingsFormProps> = ({
                 />
               </div>
 
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700 block">ธนาคารรับโอนเงินฝาก:</label>
+                <input
+                  type="text"
+                  value={settings.depositBankName}
+                  onChange={(e) => updateField('depositBankName', e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700 block">เลขที่บัญชีรับโอนเงินฝาก:</label>
+                <input
+                  type="text"
+                  value={settings.depositAccountNumber}
+                  onChange={(e) => updateField('depositAccountNumber', e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono"
+                />
+              </div>
+
+              <div className="sm:col-span-2 space-y-1">
+                <label className="font-semibold text-slate-700 block">ชื่อบัญชีรับโอนเงินฝาก:</label>
+                <input
+                  type="text"
+                  value={settings.depositAccountName}
+                  onChange={(e) => updateField('depositAccountName', e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                />
+              </div>
+
               <div className="sm:col-span-2 space-y-1">
                 <label className="font-semibold text-slate-700 block">
                   URL ตราสัญลักษณ์ / โลโก้สหกรณ์:

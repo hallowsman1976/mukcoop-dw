@@ -20,6 +20,8 @@ import {
   ScanLine,
   Info,
   ShieldAlert,
+  Landmark,
+  Copy,
 } from 'lucide-react';
 
 interface DepositFormProps {
@@ -37,6 +39,8 @@ export const DepositForm: React.FC<DepositFormProps> = ({
   onSuccess,
   onCancel,
 }) => {
+  const coopSettings = StorageService.getSystemSettings();
+  const [copied, setCopied] = useState(false);
   const memberAccounts = accounts.filter((a) => a.memberId === currentMember.memberId);
   const defaultAccount = initialAccount || memberAccounts[0] || accounts[0];
 
@@ -250,6 +254,39 @@ export const DepositForm: React.FC<DepositFormProps> = ({
           </div>
         </div>
       </div>
+
+      {coopSettings.depositAccountNumber && (
+        <section className="bg-white border border-emerald-200 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-2">
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <Landmark className="w-4 h-4 text-emerald-700" /> โอนเงินเข้าบัญชีสหกรณ์
+          </h3>
+          <div className="rounded-2xl bg-emerald-50/70 border border-emerald-100 p-3.5 text-sm space-y-1">
+            <div className="text-slate-500 text-xs">{coopSettings.depositBankName}</div>
+            <div className="font-semibold text-slate-900">{coopSettings.depositAccountName}</div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-mono text-lg font-bold text-emerald-800 tracking-wider">
+                {coopSettings.depositAccountNumber}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard?.writeText(coopSettings.depositAccountNumber).then(
+                    () => {
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    },
+                    () => undefined
+                  );
+                }}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-900 px-2.5 py-1.5 rounded-xl bg-white border border-emerald-200 cursor-pointer"
+              >
+                <Copy className="w-3.5 h-3.5" /> {copied ? 'คัดลอกแล้ว' : 'คัดลอกเลขบัญชี'}
+              </button>
+            </div>
+          </div>
+          <p className="text-[11px] text-slate-500">โอนเงินก่อน แล้วกรอกรายการและแนบสลิปด้านล่าง</p>
+        </section>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Step 1: choose account */}

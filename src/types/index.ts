@@ -146,6 +146,9 @@ export interface SystemSettings {
   contactEmail: string;
   officeAddress: string;
   logoUrl: string;
+  depositBankName: string; // cooperative account members transfer deposits into
+  depositAccountName: string;
+  depositAccountNumber: string;
 
   // 2. Financial policies
   regularInterestRate: number; // e.g. 1.75

@@ -15,6 +15,11 @@ const DEFAULT_SETTINGS = {
   officeAddress: '',
   logoUrl: '',
 
+  // Cooperative bank account that members transfer deposits into
+  depositBankName: 'ธนาคารกรุงไทย',
+  depositAccountName: 'สหกรณ์ออมทรัพย์สาธารณสุขจังหวัดมุกดาหาร จำกัด',
+  depositAccountNumber: '4201279316',
+
   regularInterestRate: 1.75,
   specialInterestRate: 2.75,
   minDepositAmount: 100,
